@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from fastapi import APIRouter, Depends
-from ..lib.db import db
-from ..lib.auth import require_admin
-from ..lib.dates import is_past_date
+from lib.db import db
+from lib.auth import require_admin
+from lib.dates import is_past_date
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 

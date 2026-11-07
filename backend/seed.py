@@ -1,7 +1,7 @@
 import json
 import asyncio
-from .lib.db import db
-from .lib.auth import hash_password
+from lib.db import db
+from lib.auth import hash_password
 
 INITIAL_SUBJECTS = json.loads("[{\"id\": \"3010416f-ac4a-5047-9202-6c991472aa23\", \"code\": \"CS-801\", \"name\": \"Machine Learning\", \"credits\": 4, \"faculty\": \"Prof. Rajneesh Kumar\", \"attendance_pct\": 91.2, \"progress_pct\": 78, \"viva_status\": \"prepared\"}, {\"id\": \"6b89589e-3749-504a-a85d-a7b4c131d445\", \"code\": \"CS-802\", \"name\": \"Cloud Computing\", \"credits\": 4, \"faculty\": \"Dr. Simran Kaur\", \"attendance_pct\": 88.5, \"progress_pct\": 70, \"viva_status\": \"in-progress\"}, {\"id\": \"e0aef16a-85b7-5f22-bf77-de22cda02f31\", \"code\": \"CS-803\", \"name\": \"Cyber Forensics & Information Security\", \"credits\": 3, \"faculty\": \"Dr. Amitoj Singh\", \"attendance_pct\": 85.0, \"progress_pct\": 66, \"viva_status\": \"in-progress\"}, {\"id\": \"9270f111-b3f8-5ae0-800c-dd341eb51e11\", \"code\": \"CS-804\", \"name\": \"Major Project & Viva Defense\", \"credits\": 8, \"faculty\": \"Dr. Hardeep Singh\", \"attendance_pct\": 92.4, \"progress_pct\": 85, \"viva_status\": \"prepared\"}, {\"id\": \"b6084a49-2a70-5f9e-8b5b-e7332d376f9f\", \"code\": \"CS-805\", \"name\": \"Industrial Training & Seminar\", \"credits\": 2, \"faculty\": \"Prof. Navjot Kaur\", \"attendance_pct\": 95.0, \"progress_pct\": 90, \"viva_status\": \"prepared\"}]")
 

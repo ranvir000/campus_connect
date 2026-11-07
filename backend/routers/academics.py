@@ -1,9 +1,9 @@
 from typing import List
 from fastapi import APIRouter, HTTPException, Depends
-from ..lib.db import db
-from ..lib.auth import require_user
-from ..lib.dates import today_ist_day_name, iso_now
-from ..models.academics import Subject, TimetableEntry, TodaySchedule, Assignment
+from lib.db import db
+from lib.auth import require_user
+from lib.dates import today_ist_day_name, iso_now
+from models.academics import Subject, TimetableEntry, TodaySchedule, Assignment
 
 router = APIRouter(prefix="/api/academics", tags=["academics"])
 

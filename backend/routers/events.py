@@ -1,10 +1,10 @@
 import uuid
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
-from ..lib.db import db
-from ..lib.auth import require_admin, require_user, get_current_user
-from ..lib.dates import iso_now, is_past_date
-from ..models.portal import Event, EventCreate, EventUpdate
+from lib.db import db
+from lib.auth import require_admin, require_user, get_current_user
+from lib.dates import iso_now, is_past_date
+from models.portal import Event, EventCreate, EventUpdate
 
 router = APIRouter(prefix="/api/events", tags=["events"])
 

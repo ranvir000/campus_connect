@@ -1,10 +1,10 @@
 import uuid
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
-from ..lib.db import db
-from ..lib.auth import require_admin, get_current_user
-from ..lib.dates import iso_now
-from ..models.portal import Notice, NoticeCreate, NoticeUpdate
+from lib.db import db
+from lib.auth import require_admin, get_current_user
+from lib.dates import iso_now
+from models.portal import Notice, NoticeCreate, NoticeUpdate
 
 router = APIRouter(prefix="/api/notices", tags=["notices"])
 

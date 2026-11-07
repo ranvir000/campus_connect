@@ -1,10 +1,10 @@
 import uuid
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
-from ..lib.db import db
-from ..lib.auth import require_admin, require_user
-from ..lib.dates import iso_now
-from ..models.support import SupportTicket, SupportTicketCreate, SupportTicketPatch
+from lib.db import db
+from lib.auth import require_admin, require_user
+from lib.dates import iso_now
+from models.support import SupportTicket, SupportTicketCreate, SupportTicketPatch
 
 router = APIRouter(prefix="/api/support", tags=["support"])
 

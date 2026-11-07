@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Response, Request, Depends
-from ..lib.db import db
-from ..lib.auth import (
+from lib.db import db
+from lib.auth import (
     hash_password,
     verify_password,
     create_session,
@@ -8,7 +8,7 @@ from ..lib.auth import (
     get_current_user,
     SESSION_COOKIE,
 )
-from ..models.auth import LoginPayload, SessionUser, AuthMeResponse
+from models.auth import LoginPayload, SessionUser, AuthMeResponse
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 

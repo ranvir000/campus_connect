@@ -1,10 +1,10 @@
 import uuid
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
-from ..lib.db import db
-from ..lib.auth import require_admin
-from ..lib.dates import iso_now
-from ..models.portal import Resource, ResourceCreate, ResourceUpdate
+from lib.db import db
+from lib.auth import require_admin
+from lib.dates import iso_now
+from models.portal import Resource, ResourceCreate, ResourceUpdate
 
 router = APIRouter(prefix="/api/resources", tags=["resources"])
 
