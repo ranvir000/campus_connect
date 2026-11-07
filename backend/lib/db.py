@@ -196,7 +196,9 @@ class Database:
         print(f"[Database] Using local embedded SQLite database at {self._sqlite_path}")
 
     def get_collection(self, name: str):
-        if self.is_mongo and self._mongo_db:
+        # PyMongo Database objects intentionally reject boolean evaluation.
+        # Check explicitly so Render startup does not raise NotImplementedError.
+        if self.is_mongo and self._mongo_db is not None:
             return self._mongo_db[name]
         if name not in self._collections:
             self._collections[name] = SQLiteCollection(self._sqlite_path, name)
