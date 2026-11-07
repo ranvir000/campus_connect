@@ -19,14 +19,14 @@ class AdminStats(BaseModel):
 async def get_admin_stats(admin: dict = Depends(require_admin)):
     students_count = await db.users.count_documents({"role": "student"})
     notices_published = await db.notices.count_documents({"published": True})
-    total_notices = await db.notices.count_documents()
+    total_notices = await db.notices.count_documents({})
 
     all_events = await db.events.find().to_list(100)
     upcoming_events_count = sum(1 for e in all_events if not is_past_date(e.get("date", "")))
 
     active_tickets = await db.support_tickets.count_documents({"status": {"$in": ["pending", "in review", "in_review"]}})
     resolved_tickets = await db.support_tickets.count_documents({"status": "resolved"})
-    resources_count = await db.resources.count_documents()
+    resources_count = await db.resources.count_documents({})
 
     return AdminStats(
         students=max(students_count, 1),

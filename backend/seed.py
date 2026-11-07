@@ -19,7 +19,7 @@ INITIAL_SUPPORT = json.loads("[{\"id\": \"9ca16b18-9d43-469d-ba5d-b6cc38e04fe6\"
 
 async def seed_database(force: bool = False):
     """Idempotently seed demo accounts and initial departmental data."""
-    user_count = await db.users.count_documents()
+    user_count = await db.users.count_documents({})
     if user_count > 0 and not force:
         print("[Seed] Database already seeded. Skipping initial seeding.")
         return
