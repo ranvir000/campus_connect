@@ -7,6 +7,9 @@ from typing import Any, Dict, List, Optional
 MONGO_URL = os.getenv("MONGO_URL") or os.getenv("MONGODB_URI")
 DB_NAME = os.getenv("MONGO_DB_NAME", "campusconnect")
 
+# Allow overriding the SQLite path via environment variable (useful for Render persistent disk)
+SQLITE_PATH = os.getenv("SQLITE_PATH", os.path.join(os.path.dirname(__file__), "..", "campusconnect.db"))
+
 # SQLite fallback implementation for zero-dependency local runs
 class SQLiteCollection:
     def __init__(self, db_path: str, name: str):
@@ -169,7 +172,7 @@ class Database:
     def __init__(self):
         self._mongo_client = None
         self._mongo_db = None
-        self._sqlite_path = os.path.join(os.path.dirname(__file__), "..", "campusconnect.db")
+        self._sqlite_path = SQLITE_PATH
         self._collections = {}
         self.is_mongo = False
 
