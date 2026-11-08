@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, HTTPException, Response, Request, Depends
 from lib.db import db
 from lib.auth import (
@@ -23,6 +24,7 @@ async def login(payload: LoginPayload, response: Response):
         key=SESSION_COOKIE,
         value=token,
         httponly=True,
+        secure=os.getenv("ENVIRONMENT", "development").lower() == "production",
         samesite="lax",
         max_age=7 * 24 * 3600,
         path="/",

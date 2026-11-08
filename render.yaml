@@ -16,6 +16,10 @@ services:
         sync: false
       - key: MONGO_DB_NAME
         value: campusconnect
+      - key: ENVIRONMENT
+        value: production
+      - key: FRONTEND_URLS
+        sync: false
 
   # ----------------------------------------------------
   # 2. Frontend Static Site (React + Vite)
@@ -31,7 +35,7 @@ services:
       # Proxy /api requests to the backend (preserves same-origin cookies)
       - type: rewrite
         source: /api/*
-        destination: https://campusconnect-backend.onrender.com/api/*
+        destination: https://campus-connect-pt36.onrender.com/api/*
       # Single-Page Application client-side routing fallback
       - type: rewrite
         source: /*

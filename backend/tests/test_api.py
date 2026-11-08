@@ -106,6 +106,58 @@ async def test_admin_notice_crud():
         assert del_resp.status_code == 200
 
 @pytest.mark.asyncio
+async def test_admin_content_is_visible_to_students():
+    admin = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
+    student = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
+    await admin.post("/api/auth/login", json={
+        "email": "hod.cse@mrsptu.ac.in",
+        "password": "admin123",
+    })
+    await student.post("/api/auth/login", json={
+        "email": "aman.cse084@mrsptu.ac.in",
+        "password": "student123",
+    })
+
+    notice = (await admin.post("/api/notices", json={
+        "title": "Cross-role sync notice",
+        "category": "Academic",
+        "body": "This published notice must be visible to students.",
+        "published": True,
+    })).json()
+    event = (await admin.post("/api/events", json={
+        "title": "Cross-role sync event",
+        "club": "Coding Club",
+        "category": "Technical",
+        "description": "This event must be visible to students.",
+        "venue": "CS Lab",
+        "date": "2099-12-01T10:00:00+05:30",
+        "capacity": 30,
+    })).json()
+    resource = (await admin.post("/api/resources", json={
+        "title": "Cross-role sync resource",
+        "kind": "Notes",
+        "subject": "Machine Learning",
+        "url": "https://example.com/sync-resource",
+        "description": "This resource must be visible to students.",
+    })).json()
+
+    updated = await admin.put(f"/api/notices/{notice['id']}", json={"title": "Updated sync notice"})
+    assert updated.status_code == 200
+
+    notices = (await student.get("/api/notices")).json()
+    events = (await student.get("/api/events")).json()
+    resources = (await student.get("/api/resources")).json()
+    assert any(n["id"] == notice["id"] and n["title"] == "Updated sync notice" for n in notices)
+    assert any(e["id"] == event["id"] and e["title"] == event["title"] for e in events)
+    assert any(r["id"] == resource["id"] and r["title"] == resource["title"] for r in resources)
+
+    assert (await admin.delete(f"/api/notices/{notice['id']}")).status_code == 200
+    assert (await admin.delete(f"/api/events/{event['id']}")).status_code == 200
+    assert (await admin.delete(f"/api/resources/{resource['id']}")).status_code == 200
+    await admin.aclose()
+    await student.aclose()
+
+@pytest.mark.asyncio
 async def test_student_support_ticket_flow():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # 1. Student creates ticket

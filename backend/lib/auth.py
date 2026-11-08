@@ -2,13 +2,15 @@ import os
 import hashlib
 import hmac
 import secrets
+from datetime import timedelta
 from typing import Optional
 from fastapi import Request, HTTPException, Depends
 from lib.db import db
-from lib.dates import iso_now
+from lib.dates import iso_now, now_ist, parse_iso
 
 SESSION_COOKIE = "session_token"
 PBKDF2_ITERATIONS = 100_000
+SESSION_TTL = timedelta(days=7)
 
 def hash_password(password: str) -> str:
     """Hash a password using PBKDF2-HMAC-SHA256 with a random 16-byte salt."""
@@ -37,6 +39,7 @@ async def create_session(user_id: str) -> str:
         "token": token,
         "user_id": user_id,
         "created_at": iso_now(),
+        "expires_at": (now_ist() + SESSION_TTL).isoformat(),
     })
     return token
 
@@ -58,6 +61,20 @@ async def get_current_user(request: Request) -> Optional[dict]:
     session = await db.sessions.find_one({"token": token})
     if not session:
         return None
+
+    # Reject expired sessions server-side, even if the client retains its cookie.
+    # The created_at fallback keeps sessions from older deployments compatible.
+    expires_at = session.get("expires_at")
+    if not expires_at and session.get("created_at"):
+        expires_at = (parse_iso(session["created_at"]) + SESSION_TTL).isoformat()
+    if expires_at:
+        try:
+            if parse_iso(expires_at) <= now_ist():
+                await delete_session(token)
+                return None
+        except (TypeError, ValueError):
+            await delete_session(token)
+            return None
 
     user = await db.users.find_one({"id": session["user_id"]})
     return user
