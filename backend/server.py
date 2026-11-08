@@ -36,6 +36,11 @@ origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+origins.extend(
+    origin.strip()
+    for origin in os.getenv("FRONTEND_URLS", "").split(",")
+    if origin.strip()
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
