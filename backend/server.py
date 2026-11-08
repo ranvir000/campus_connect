@@ -57,6 +57,15 @@ app.include_router(admin_router)
 async def health_check():
     return {"status": "ok", "database": "connected", "app": "CampusConnect"}
 
+@app.get("/")
+async def api_root():
+    return {
+        "app": "CampusConnect API",
+        "status": "ok",
+        "health": "/api/health",
+        "message": "Use the CampusConnect frontend URL for the web application.",
+    }
+
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8001))
     uvicorn.run("backend.server:app", host="0.0.0.0", port=port, reload=True)

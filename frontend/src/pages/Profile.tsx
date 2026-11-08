@@ -44,7 +44,7 @@ export default function Profile() {
     .join("")
     .toUpperCase();
 
-  const details: Array<[string, string]> = isAdmin
+  const details: Array<[string, string | number]> = isAdmin
     ? [
         ["Designation", user?.designation ?? "—"],
         ["Department", user?.branch ?? "—"],
