@@ -22,9 +22,6 @@ import type { CampusEvent, Notice } from "@/lib/types";
 
 const HERO_IMG =
   "https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwxfHxjb2xsZWdlJTIwdW5pdmVyc2l0eSUyMGNhbXB1c3xlbnwwfHx8fDE3OTM5NzAzODd8MA&ixlib=rb-4.1.0&q=85";
-const LAB_IMG =
-  "https://images.unsplash.com/photo-1569653402334-2e98fbaa80ee?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODl8MHwxfHNlYXJjaHwxfHBpbmRpYW4lMjB1bml2ZXJzaXR5JTIwc3R1ZGVudHMlMjB0ZWNofGVufDB8fHx8MTc5Mzk3MDM4N3ww&ixlib=rb-4.1.0&q=85";
-
 // Shown only while/if the live fetch is unavailable (e.g. static preview) — the
 // page itself always renders.
 const SAMPLE_NOTICES: Notice[] = [
@@ -268,14 +265,14 @@ export default function Home() {
               <CardContent className="p-4">
                 <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Student</p>
                 <p className="mt-1 font-medium">aman.cse084@mrsptu.ac.in</p>
-                <p className="font-mono text-xs text-muted-foreground">password: student123</p>
+                <p className="text-xs text-muted-foreground">Use the viva credentials on the sign-in screen.</p>
               </CardContent>
             </Card>
             <Card size="sm" className="bg-secondary/50">
               <CardContent className="p-4">
                 <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Administrator</p>
                 <p className="mt-1 font-medium">hod.cse@mrsptu.ac.in</p>
-                <p className="font-mono text-xs text-muted-foreground">password: admin123</p>
+                <p className="text-xs text-muted-foreground">Use the viva credentials on the sign-in screen.</p>
               </CardContent>
             </Card>
             <Link

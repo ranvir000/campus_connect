@@ -44,6 +44,29 @@ async def test_login_invalid_password():
         assert resp.status_code == 401
 
 @pytest.mark.asyncio
+async def test_login_sets_csrf_cookie_and_throttles_repeated_failures():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        success = await client.post("/api/auth/login", json={
+            "email": "aman.cse084@mrsptu.ac.in",
+            "password": "student123",
+        })
+        assert success.status_code == 200
+        assert "csrf_token" in success.cookies
+
+        unique_email = "rate-limit-check@mrsptu.ac.in"
+        for _ in range(5):
+            failed = await client.post("/api/auth/login", json={
+                "email": unique_email,
+                "password": "wrongpassword",
+            })
+            assert failed.status_code == 401
+        blocked = await client.post("/api/auth/login", json={
+            "email": unique_email,
+            "password": "wrongpassword",
+        })
+        assert blocked.status_code == 429
+
+@pytest.mark.asyncio
 async def test_unauthenticated_access_blocked():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.get("/api/academics/subjects")

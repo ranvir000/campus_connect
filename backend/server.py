@@ -1,4 +1,5 @@
 import os
+import hmac
 import uvicorn
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
@@ -48,6 +49,24 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def csrf_protection(request, call_next):
+    """Require the readable CSRF cookie to match the request header in production."""
+    protected = request.method in {"POST", "PUT", "PATCH", "DELETE"}
+    exempt = request.url.path == "/api/auth/login"
+    if (
+        os.getenv("ENVIRONMENT", "development").lower() == "production"
+        and request.url.path.startswith("/api/")
+        and protected
+        and not exempt
+    ):
+        cookie_token = request.cookies.get("csrf_token", "")
+        header_token = request.headers.get("X-CSRF-Token", "")
+        if not cookie_token or not header_token or not hmac.compare_digest(cookie_token, header_token):
+            from fastapi.responses import JSONResponse
+            return JSONResponse({"detail": "CSRF validation failed."}, status_code=403)
+    return await call_next(request)
 
 # Router registration
 app.include_router(auth_router)

@@ -23,12 +23,20 @@ export class ApiError extends Error {
 
 type JsonBody = unknown;
 
+function csrfToken(): string | undefined {
+  if (typeof document === "undefined") return undefined;
+  return document.cookie.split("; ").find((entry) => entry.startsWith("csrf_token="))?.split("=").slice(1).join("=");
+}
+
 async function request<T>(method: string, path: string, body?: JsonBody): Promise<T> {
+  const csrf = csrfToken();
+  const headers: Record<string, string> = body === undefined ? {} : { "Content-Type": "application/json" };
+  if (csrf) headers["X-CSRF-Token"] = decodeURIComponent(csrf);
   // Auth rides the httpOnly session cookie automatically — never add auth headers here.
   const res = await fetch(`${BASE}${path}`, {
     method,
     credentials: "include",
-    headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+    headers,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 

@@ -2,10 +2,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import {
   BadgeCheck,
-  Bell,
   GraduationCap,
   LogOut,
-  Mail,
   Moon,
   Save,
   ShieldCheck,

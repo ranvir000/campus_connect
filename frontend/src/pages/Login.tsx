@@ -19,12 +19,12 @@ const HERO_IMG =
 const DEMO: Record<"student" | "admin", { email: string; password: string; hint: string }> = {
   student: {
     email: "aman.cse084@mrsptu.ac.in",
-    password: "student123",
+    password: "",
     hint: "Amanpreet Singh — B.Tech CSE, 8th Semester (Roll 2021CSE084)",
   },
   admin: {
     email: "hod.cse@mrsptu.ac.in",
-    password: "admin123",
+    password: "",
     hint: "Dr. Hardeep Singh — Head of Department, CSE",
   },
 };

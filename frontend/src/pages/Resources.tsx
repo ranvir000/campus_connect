@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState, LoadError, PageHeader, Spinner } from "@/components/bits";
 import { apiGet } from "@/lib/api";
 import type { ResourceItem } from "@/lib/types";

@@ -4,7 +4,7 @@ import { ArrowRight, BadgeCheck, Bell, CalendarDays, ClipboardList, ExternalLink
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { EmptyState, LoadError, Spinner, StatusBadge, StatCard } from "@/components/bits";
+import { EmptyState, LoadError, Spinner, StatCard } from "@/components/bits";
 import { apiGet } from "@/lib/api";
 import { fmtDate } from "@/lib/format";
 import { useSession } from "@/lib/session";

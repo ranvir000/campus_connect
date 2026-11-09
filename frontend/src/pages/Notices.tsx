@@ -95,7 +95,7 @@ export default function Notices() {
           className="space-y-3"
           data-testid="notices-list"
         >
-          {notices.map((n, i) => (
+          {notices.map((n) => (
             <motion.li
               key={n.id}
               variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}

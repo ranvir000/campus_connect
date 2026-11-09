@@ -1,28 +1,31 @@
+import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { MotionConfig } from "motion/react";
 import { Toaster } from "@/components/ui/sonner";
 import { RequireAuth } from "@/components/RequireAuth";
-import Home from "@/pages/Home";
-import Login from "@/pages/Login";
-import Dashboard from "@/pages/Dashboard";
-import Academics from "@/pages/Academics";
-import Notices from "@/pages/Notices";
-import Events from "@/pages/Events";
-import Resources from "@/pages/Resources";
-import Support from "@/pages/Support";
-import Profile from "@/pages/Profile";
-import AdminDashboard from "@/pages/AdminDashboard";
-import AdminNotices from "@/pages/AdminNotices";
-import AdminEvents from "@/pages/AdminEvents";
-import AdminResources from "@/pages/AdminResources";
-import AdminSupport from "@/pages/AdminSupport";
+
+const Home = lazy(() => import("@/pages/Home"));
+const Login = lazy(() => import("@/pages/Login"));
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const Academics = lazy(() => import("@/pages/Academics"));
+const Notices = lazy(() => import("@/pages/Notices"));
+const Events = lazy(() => import("@/pages/Events"));
+const Resources = lazy(() => import("@/pages/Resources"));
+const Support = lazy(() => import("@/pages/Support"));
+const Profile = lazy(() => import("@/pages/Profile"));
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+const AdminNotices = lazy(() => import("@/pages/AdminNotices"));
+const AdminEvents = lazy(() => import("@/pages/AdminEvents"));
+const AdminResources = lazy(() => import("@/pages/AdminResources"));
+const AdminSupport = lazy(() => import("@/pages/AdminSupport"));
 
 // One <Route> per page in src/pages; BrowserRouter already wraps this in main.tsx.
 export default function App() {
   return (
     <MotionConfig reducedMotion="user">
-      <Routes>
-        <Route path="/" element={<Home />} />
+      <Suspense fallback={<div className="grid min-h-svh place-items-center text-sm text-muted-foreground">Loading CampusConnect…</div>}>
+        <Routes>
+          <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
         <Route path="/academics" element={<RequireAuth><Academics /></RequireAuth>} />
@@ -36,8 +39,9 @@ export default function App() {
         <Route path="/admin/events" element={<RequireAuth admin><AdminEvents /></RequireAuth>} />
         <Route path="/admin/resources" element={<RequireAuth admin><AdminResources /></RequireAuth>} />
         <Route path="/admin/support" element={<RequireAuth admin><AdminSupport /></RequireAuth>} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
       <Toaster richColors />
     </MotionConfig>
   );
