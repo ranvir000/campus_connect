@@ -19,12 +19,14 @@ const HERO_IMG =
 const DEMO: Record<"student" | "admin", { email: string; password: string; hint: string }> = {
   student: {
     email: "aman.cse084@mrsptu.ac.in",
-    password: "",
+    // Controlled viva-only demo account; passwords are no longer shown on the public homepage.
+    password: "student123",
     hint: "Amanpreet Singh — B.Tech CSE, 8th Semester (Roll 2021CSE084)",
   },
   admin: {
     email: "hod.cse@mrsptu.ac.in",
-    password: "",
+    // Controlled viva-only demo account; change or remove before real deployment.
+    password: "admin123",
     hint: "Dr. Hardeep Singh — Head of Department, CSE",
   },
 };
