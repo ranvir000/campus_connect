@@ -20,8 +20,8 @@ A full-stack role-based student and department portal built for Maharaja Ranjit 
 
 | Role | E-mail | Password | Profile |
 | :--- | :--- | :--- | :--- |
-| **Student** | `aman.cse084@mrsptu.ac.in` | `student123` | Amanpreet Singh, Roll 2021CSE084 (8th Sem) |
-| **Administrator** | `hod.cse@mrsptu.ac.in` | `admin123` | Dr. Hardeep Singh, Head of Department |
+| **Student** | `aman@gmail.com` | `aman123` | Amanpreet Singh, Roll 2021CSE084 (8th Sem) |
+| **Administrator** | `hod@gmail.com` | `hod123` | Dr. Hardeep Singh, Head of Department |
 
 ---
 

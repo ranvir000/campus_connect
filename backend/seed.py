@@ -20,6 +20,16 @@ INITIAL_SUPPORT = json.loads("[{\"id\": \"9ca16b18-9d43-469d-ba5d-b6cc38e04fe6\"
 async def seed_database(force: bool = False):
     """Idempotently seed demo accounts and initial departmental data."""
     user_count = await db.users.count_documents({})
+    # Migrate the original seeded accounts in place so an already-populated
+    # deployment receives the current viva credentials without losing data.
+    await db.users.update_one(
+        {"id": "7f769313-537d-552f-9e77-5b315efb2559"},
+        {"$set": {"email": "aman@gmail.com", "password_hash": hash_password("aman123")}},
+    )
+    await db.users.update_one(
+        {"id": "a2d35653-e0be-54d3-867d-4787e6d7cd1f"},
+        {"$set": {"email": "hod@gmail.com", "password_hash": hash_password("hod123")}},
+    )
     if user_count > 0 and not force:
         print("[Seed] Database already seeded. Skipping initial seeding.")
         return
@@ -30,8 +40,8 @@ async def seed_database(force: bool = False):
     await db.users.insert_one({
         "id": "7f769313-537d-552f-9e77-5b315efb2559",
         "name": "Amanpreet Singh",
-        "email": "aman.cse084@mrsptu.ac.in",
-        "password_hash": hash_password("student123"),
+        "email": "aman@gmail.com",
+        "password_hash": hash_password("aman123"),
         "role": "student",
         "roll_no": "2021CSE084",
         "branch": "B.Tech CSE",
@@ -46,8 +56,8 @@ async def seed_database(force: bool = False):
     await db.users.insert_one({
         "id": "a2d35653-e0be-54d3-867d-4787e6d7cd1f",
         "name": "Dr. Hardeep Singh",
-        "email": "hod.cse@mrsptu.ac.in",
-        "password_hash": hash_password("admin123"),
+        "email": "hod@gmail.com",
+        "password_hash": hash_password("hod123"),
         "role": "admin",
         "roll_no": "",
         "branch": "Computer Science & Engineering",

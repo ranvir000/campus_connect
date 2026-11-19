@@ -13,12 +13,12 @@ async def setup_db():
 async def test_student_login_success():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post("/api/auth/login", json={
-            "email": "aman.cse084@mrsptu.ac.in",
-            "password": "student123"
+            "email": "aman@gmail.com",
+            "password": "aman123"
         })
         assert resp.status_code == 200
         data = resp.json()
-        assert data["email"] == "aman.cse084@mrsptu.ac.in"
+        assert data["email"] == "aman@gmail.com"
         assert data["role"] == "student"
         assert "session_token" in resp.cookies
 
@@ -26,19 +26,19 @@ async def test_student_login_success():
 async def test_admin_login_success():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post("/api/auth/login", json={
-            "email": "hod.cse@mrsptu.ac.in",
-            "password": "admin123"
+            "email": "hod@gmail.com",
+            "password": "hod123"
         })
         assert resp.status_code == 200
         data = resp.json()
-        assert data["email"] == "hod.cse@mrsptu.ac.in"
+        assert data["email"] == "hod@gmail.com"
         assert data["role"] == "admin"
 
 @pytest.mark.asyncio
 async def test_login_invalid_password():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post("/api/auth/login", json={
-            "email": "aman.cse084@mrsptu.ac.in",
+            "email": "aman@gmail.com",
             "password": "wrongpassword"
         })
         assert resp.status_code == 401
@@ -47,8 +47,8 @@ async def test_login_invalid_password():
 async def test_login_sets_csrf_cookie_and_throttles_repeated_failures():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         success = await client.post("/api/auth/login", json={
-            "email": "aman.cse084@mrsptu.ac.in",
-            "password": "student123",
+            "email": "aman@gmail.com",
+            "password": "aman123",
         })
         assert success.status_code == 200
         assert "csrf_token" in success.cookies
@@ -77,8 +77,8 @@ async def test_student_forbidden_on_admin_stats():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # Login as student
         await client.post("/api/auth/login", json={
-            "email": "aman.cse084@mrsptu.ac.in",
-            "password": "student123"
+            "email": "aman@gmail.com",
+            "password": "aman123"
         })
         resp = await client.get("/api/admin/stats")
         assert resp.status_code == 403
@@ -88,8 +88,8 @@ async def test_admin_stats_success():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # Login as admin
         await client.post("/api/auth/login", json={
-            "email": "hod.cse@mrsptu.ac.in",
-            "password": "admin123"
+            "email": "hod@gmail.com",
+            "password": "hod123"
         })
         resp = await client.get("/api/admin/stats")
         assert resp.status_code == 200
@@ -102,8 +102,8 @@ async def test_admin_notice_crud():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # Login as admin
         await client.post("/api/auth/login", json={
-            "email": "hod.cse@mrsptu.ac.in",
-            "password": "admin123"
+            "email": "hod@gmail.com",
+            "password": "hod123"
         })
 
         # 1. Create notice
@@ -133,12 +133,12 @@ async def test_admin_content_is_visible_to_students():
     admin = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
     student = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
     await admin.post("/api/auth/login", json={
-        "email": "hod.cse@mrsptu.ac.in",
-        "password": "admin123",
+        "email": "hod@gmail.com",
+        "password": "hod123",
     })
     await student.post("/api/auth/login", json={
-        "email": "aman.cse084@mrsptu.ac.in",
-        "password": "student123",
+        "email": "aman@gmail.com",
+        "password": "aman123",
     })
 
     notice = (await admin.post("/api/notices", json={
@@ -185,8 +185,8 @@ async def test_student_support_ticket_flow():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # 1. Student creates ticket
         await client.post("/api/auth/login", json={
-            "email": "aman.cse084@mrsptu.ac.in",
-            "password": "student123"
+            "email": "aman@gmail.com",
+            "password": "aman123"
         })
         ticket_resp = await client.post("/api/support", json={
             "category": "Academic",
@@ -201,8 +201,8 @@ async def test_student_support_ticket_flow():
 
         # 2. Admin reviews and resolves ticket
         await client.post("/api/auth/login", json={
-            "email": "hod.cse@mrsptu.ac.in",
-            "password": "admin123"
+            "email": "hod@gmail.com",
+            "password": "hod123"
         })
         patch_resp = await client.patch(f"/api/support/{ticket_id}", json={
             "status": "resolved",

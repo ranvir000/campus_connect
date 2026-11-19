@@ -38,7 +38,7 @@ export default function Events() {
         : apiDelete<CampusEvent>(`/events/${ev.id}/register`),
     onSuccess: (updated) => {
       void queryClient.invalidateQueries({ queryKey: ["events"] });
-      toast.success(updated.registered ? `Registered for ${updated.title}` : `Registration cancelled for ${updated.title}`);
+      toast.success(updated.registered ? "You are registered" : `Registration cancelled for ${updated.title}`);
     },
     onError: (e) => toast.error(apiErrorMessage(e)),
   });

@@ -264,14 +264,14 @@ export default function Home() {
             <Card size="sm" className="bg-secondary/50">
               <CardContent className="p-4">
                 <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Student</p>
-                <p className="mt-1 font-medium">aman.cse084@mrsptu.ac.in</p>
+                <p className="mt-1 font-medium">aman@gmail.com</p>
                 <p className="text-xs text-muted-foreground">Use the viva credentials on the sign-in screen.</p>
               </CardContent>
             </Card>
             <Card size="sm" className="bg-secondary/50">
               <CardContent className="p-4">
                 <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Administrator</p>
-                <p className="mt-1 font-medium">hod.cse@mrsptu.ac.in</p>
+                <p className="mt-1 font-medium">hod@gmail.com</p>
                 <p className="text-xs text-muted-foreground">Use the viva credentials on the sign-in screen.</p>
               </CardContent>
             </Card>

@@ -34,7 +34,7 @@ const KIND_ICONS: Record<string, typeof FileText> = {
 };
 
 const CONTACTS = [
-  { name: "HOD Office — Dr. Hardeep Singh", detail: "hod.cse@mrsptu.ac.in", note: "Room A-201, CS Block • Mon–Fri 10 AM–4 PM", icon: Mail },
+  { name: "HOD Office — Dr. Hardeep Singh", detail: "hod@gmail.com", note: "Room A-201, CS Block • Mon–Fri 10 AM–4 PM", icon: Mail },
   { name: "Examination Cell", detail: "exam.cse@mrsptu.ac.in", note: "Ext. 234 • Hall tickets & form corrections", icon: Phone },
   { name: "Central Library", detail: "library@mrsptu.ac.in", note: "Ext. 156 • Book issues & late returns", icon: Phone },
   { name: "Anti-Ragging Helpline", detail: "1800-180-5522", note: "24×7 • University & UGC helpline", icon: ShieldCheck },
