@@ -3,7 +3,7 @@ from httpx import AsyncClient, ASGITransport
 from backend.server import app
 from backend.lib.db import db
 from backend.lib.auth import hash_password
-from backend.seed import seed_database
+from backend.seed import seed_database, LEGACY_RESOURCE_URLS
 
 @pytest.fixture(autouse=True)
 async def setup_db():
@@ -67,6 +67,24 @@ async def test_seed_migrates_existing_demo_passwords():
         })
         assert student.status_code == 200
         assert admin.status_code == 200
+
+@pytest.mark.asyncio
+async def test_broken_seed_resource_links_are_retired_but_repaired_links_are_preserved():
+    entries = list(LEGACY_RESOURCE_URLS.items())
+    broken_id, broken_url = entries[0]
+    repaired_id, _ = entries[1]
+    repaired_url = "https://storage.example.edu/anti-ragging.pdf"
+
+    await db.resources.update_one({"id": broken_id}, {"$set": {"url": broken_url}})
+    await db.resources.update_one({"id": repaired_id}, {"$set": {"url": repaired_url}})
+    await seed_database()
+
+    broken = await db.resources.find_one({"id": broken_id})
+    repaired = await db.resources.find_one({"id": repaired_id})
+    assert broken["url"] == ""
+    assert "has not uploaded" in broken["description"]
+    assert repaired["url"] == repaired_url
+
 
 @pytest.mark.asyncio
 async def test_login_sets_csrf_cookie_and_throttles_repeated_failures():

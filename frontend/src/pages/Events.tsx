@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { CalendarDays, CheckCircle2, Code2, Cpu, MapPin, Trophy, Users, Wrench } from "lucide-react";
+import { CalendarDays, CheckCircle2, Code2, Cpu, Loader2, MapPin, Trophy, Users, Wrench } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,6 +28,7 @@ export default function Events() {
   const { data } = useSession();
   const user = data?.user ?? null;
   const queryClient = useQueryClient();
+  const [pendingEventIds, setPendingEventIds] = useState<Set<string>>(() => new Set());
 
   const eventsQuery = useQuery({
     queryKey: ["events", "all"],
@@ -43,13 +45,25 @@ export default function Events() {
       toast.success(eventRegistrationSuccessMessage(register, ev.title));
     },
     onError: (e) => toast.error(apiErrorMessage(e)),
+    onMutate: ({ ev }) => {
+      setPendingEventIds((current) => new Set(current).add(ev.id));
+    },
+    onSettled: (_updated, _error, { ev }) => {
+      setPendingEventIds((current) => {
+        const next = new Set(current);
+        next.delete(ev.id);
+        return next;
+      });
+    },
   });
 
   const events = eventsQuery.data ?? [];
   const upcoming = events.filter((e) => !e.is_past);
   const past = events.filter((e) => e.is_past).reverse();
 
-  const EventCard = ({ ev }: { ev: CampusEvent }) => (
+  const EventCard = ({ ev }: { ev: CampusEvent }) => {
+    const isRsvpPending = pendingEventIds.has(ev.id);
+    return (
     <Card data-testid={`event-card-${ev.id}`} className="transition-all hover:-translate-y-0.5 hover:shadow-md">
       <CardContent className="space-y-3">
         <div className="flex items-center justify-between gap-2">
@@ -73,13 +87,15 @@ export default function Events() {
                 variant="secondary"
                 data-testid={`event-rsvp-button-${ev.id}`}
                 onClick={() => rsvp.mutate({ ev, register: false })}
-                disabled={rsvp.isPending}
+                disabled={isRsvpPending}
               >
-                <CheckCircle2 className="size-4 text-emerald-600" /> Registered — cancel
+                {isRsvpPending ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4 text-emerald-600" />}
+                {isRsvpPending ? "Cancelling…" : "Registered — cancel"}
               </Button>
             ) : (
-              <Button size="sm" data-testid={`event-rsvp-button-${ev.id}`} onClick={() => rsvp.mutate({ ev, register: true })} disabled={rsvp.isPending}>
-                Register
+              <Button size="sm" data-testid={`event-rsvp-button-${ev.id}`} onClick={() => rsvp.mutate({ ev, register: true })} disabled={isRsvpPending}>
+                {isRsvpPending ? <Loader2 className="size-4 animate-spin" /> : null}
+                {isRsvpPending ? "Registering…" : "Register"}
               </Button>
             )
           ) : user?.role === "admin" ? (
@@ -92,7 +108,8 @@ export default function Events() {
         </div>
       </CardContent>
     </Card>
-  );
+    );
+  };
 
   return (
     <div className="space-y-8">

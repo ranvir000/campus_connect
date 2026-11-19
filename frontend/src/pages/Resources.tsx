@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
+  ArrowRight,
   CalendarDays,
   ChevronDown,
   ExternalLink,
@@ -74,7 +76,7 @@ export default function Resources() {
       <div>
         <PageHeader
           title="Campus Resources"
-          description="Documents, links, contacts and answers to frequently asked questions."
+          description="Verified links and resource listings. If a document is not uploaded yet, request it from the department."
         />
 
         <div className="mb-4 flex flex-wrap gap-2" data-testid="resource-kind-filters">
@@ -128,7 +130,19 @@ export default function Resources() {
                       >
                         Open resource <ExternalLink className="size-3.5" />
                       </a>
-                    ) : null}
+                    ) : (
+                      <div className="mt-1 rounded-md border border-dashed bg-muted/40 p-3" data-testid={`resource-unavailable-${r.id}`}>
+                        <Badge variant="outline">Not uploaded yet</Badge>
+                        <p className="mt-2 text-xs text-muted-foreground">There is no file or working source attached to this listing yet.</p>
+                        <Link
+                          to={`/support?resource=${encodeURIComponent(r.title)}`}
+                          data-testid={`resource-request-${r.id}`}
+                          className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
+                        >
+                          Request this resource <ArrowRight className="size-3.5" />
+                        </Link>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               );

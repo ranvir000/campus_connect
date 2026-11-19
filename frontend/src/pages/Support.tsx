@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LifeBuoy, Loader2, Send } from "lucide-react";
@@ -19,10 +20,14 @@ const PRIORITIES = ["Low", "Medium", "High"];
 
 export default function Support() {
   const queryClient = useQueryClient();
-  const [category, setCategory] = useState(CATEGORIES[0]);
-  const [subject, setSubject] = useState("");
+  const [searchParams] = useSearchParams();
+  const requestedResource = (searchParams.get("resource") ?? "").trim().slice(0, 120);
+  const [category, setCategory] = useState(requestedResource ? "Academics" : CATEGORIES[0]);
+  const [subject, setSubject] = useState(requestedResource ? `Resource request: ${requestedResource}` : "");
   const [priority, setPriority] = useState("Medium");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState(
+    requestedResource ? `Please share or upload “${requestedResource}” when it becomes available.` : "",
+  );
 
   const ticketsQuery = useQuery({
     queryKey: ["support", "mine"],
