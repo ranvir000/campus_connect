@@ -93,7 +93,7 @@ export default function Login() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="font-heading text-2xl">Sign in</CardTitle>
-            <CardDescription>Choose your role — demo credentials are prefilled for the viva.</CardDescription>
+            <CardDescription>Choose your role and enter your credentials to continue.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <Tabs value={role} onValueChange={switchRole}>
@@ -108,8 +108,8 @@ export default function Login() {
             </Tabs>
 
             <div className="rounded-lg border border-dashed bg-secondary/40 px-3 py-2" data-testid="demo-credentials-hint">
-              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Demo credentials
+                <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Demo account
               </p>
               <p className="mt-0.5 text-xs text-foreground/90">{DEMO[role].hint}</p>
             </div>
@@ -127,7 +127,7 @@ export default function Login() {
                   id="login-email"
                   data-testid="login-email-input"
                   type="email"
-                  autoComplete="email"
+                  autoComplete="new-password"
                   placeholder="you@mrsptu.ac.in"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -139,7 +139,7 @@ export default function Login() {
                   id="login-password"
                   data-testid="login-password-input"
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
