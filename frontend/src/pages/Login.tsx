@@ -16,15 +16,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const HERO_IMG =
   "https://images.unsplash.com/photo-1623631484725-fef26b75b402?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxjb2xsZWdlJTIwdW5pdmVyc2l0eSUyMGNhbXB1c3xlbnwwfHx8fDE3OTM5NzAzODd8MA&ixlib=rb-4.1.0&q=85";
 
-const DEMO: Record<"student" | "admin", { hint: string }> = {
-  student: {
-    hint: "Amanpreet Singh — B.Tech CSE, 8th Semester (Roll 2021CSE084)",
-  },
-  admin: {
-    hint: "Dr. Hardeep Singh — Head of Department, CSE",
-  },
-};
-
 type Role = "student" | "admin";
 
 export default function Login() {
@@ -89,7 +80,7 @@ export default function Login() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="font-heading text-2xl">Sign in</CardTitle>
-            <CardDescription>Choose your role and enter your credentials to continue.</CardDescription>
+            <CardDescription>Sign in to continue.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <Tabs value={role} onValueChange={switchRole}>
@@ -103,13 +94,6 @@ export default function Login() {
               </TabsList>
             </Tabs>
 
-            <div className="rounded-lg border border-dashed bg-secondary/40 px-3 py-2" data-testid="demo-credentials-hint">
-                <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Demo account
-              </p>
-              <p className="mt-0.5 text-xs text-foreground/90">{DEMO[role].hint}</p>
-            </div>
-
             <form
               className="space-y-4"
               onSubmit={(e) => {
@@ -118,13 +102,13 @@ export default function Login() {
               }}
             >
               <div className="space-y-2">
-                <Label htmlFor="login-email">Email</Label>
+                <Label htmlFor="login-email">Username</Label>
                 <Input
                   id="login-email"
                   data-testid="login-email-input"
                   type="email"
                   autoComplete="new-password"
-                  placeholder="you@mrsptu.ac.in"
+                  placeholder="Enter your username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -136,7 +120,7 @@ export default function Login() {
                   data-testid="login-password-input"
                   type="password"
                   autoComplete="new-password"
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
