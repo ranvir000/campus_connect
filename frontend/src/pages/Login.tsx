@@ -16,15 +16,11 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const HERO_IMG =
   "https://images.unsplash.com/photo-1623631484725-fef26b75b402?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxjb2xsZWdlJTIwdW5pdmVyc2l0eSUyMGNhbXB1c3xlbnwwfHx8fDE3OTM5NzAzODd8MA&ixlib=rb-4.1.0&q=85";
 
-const DEMO: Record<"student" | "admin", { email: string; password: string; hint: string }> = {
+const DEMO: Record<"student" | "admin", { hint: string }> = {
   student: {
-    email: "aman@gmail.com",
-    password: "",
     hint: "Amanpreet Singh — B.Tech CSE, 8th Semester (Roll 2021CSE084)",
   },
   admin: {
-    email: "hod@gmail.com",
-    password: "",
     hint: "Dr. Hardeep Singh — Head of Department, CSE",
   },
 };
@@ -36,8 +32,8 @@ export default function Login() {
   const navigate = useNavigate();
   const initialRole: Role = (location.state as { role?: string } | null)?.role === "admin" ? "admin" : "student";
   const [role, setRole] = useState<Role>(initialRole);
-  const [email, setEmail] = useState(DEMO[initialRole].email);
-  const [password, setPassword] = useState(DEMO[initialRole].password);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const login = useMutation({
     mutationFn: (payload: { email: string; password: string }) => apiPost<SessionUser>("/auth/login", payload),
@@ -54,8 +50,8 @@ export default function Login() {
   const switchRole = (value: string) => {
     const next = value as Role;
     setRole(next);
-    setEmail(DEMO[next].email);
-    setPassword(DEMO[next].password);
+    setEmail("");
+    setPassword("");
   };
 
   const canSubmit = email.trim() !== "" && password !== "" && !login.isPending;

@@ -2,6 +2,7 @@ import pytest
 from httpx import AsyncClient, ASGITransport
 from backend.server import app
 from backend.lib.db import db
+from backend.lib.auth import hash_password
 from backend.seed import seed_database
 
 @pytest.fixture(autouse=True)
@@ -14,7 +15,7 @@ async def test_student_login_success():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post("/api/auth/login", json={
             "email": "aman@gmail.com",
-            "password": "aman123"
+            "password": "pass-aman123"
         })
         assert resp.status_code == 200
         data = resp.json()
@@ -27,7 +28,7 @@ async def test_admin_login_success():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post("/api/auth/login", json={
             "email": "hod@gmail.com",
-            "password": "hod123"
+            "password": "pass-hod123"
         })
         assert resp.status_code == 200
         data = resp.json()
@@ -39,16 +40,40 @@ async def test_login_invalid_password():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post("/api/auth/login", json={
             "email": "aman@gmail.com",
-            "password": "wrongpassword"
+            "password": "aman123"
         })
         assert resp.status_code == 401
+
+@pytest.mark.asyncio
+async def test_seed_migrates_existing_demo_passwords():
+    await db.users.update_one(
+        {"id": "7f769313-537d-552f-9e77-5b315efb2559"},
+        {"$set": {"password_hash": hash_password("aman123")}},
+    )
+    await db.users.update_one(
+        {"id": "a2d35653-e0be-54d3-867d-4787e6d7cd1f"},
+        {"$set": {"password_hash": hash_password("hod123")}},
+    )
+    await seed_database()
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        student = await client.post("/api/auth/login", json={
+            "email": "aman@gmail.com",
+            "password": "pass-aman123",
+        })
+        admin = await client.post("/api/auth/login", json={
+            "email": "hod@gmail.com",
+            "password": "pass-hod123",
+        })
+        assert student.status_code == 200
+        assert admin.status_code == 200
 
 @pytest.mark.asyncio
 async def test_login_sets_csrf_cookie_and_throttles_repeated_failures():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         success = await client.post("/api/auth/login", json={
             "email": "aman@gmail.com",
-            "password": "aman123",
+            "password": "pass-aman123",
         })
         assert success.status_code == 200
         assert "csrf_token" in success.cookies
@@ -78,7 +103,7 @@ async def test_student_forbidden_on_admin_stats():
         # Login as student
         await client.post("/api/auth/login", json={
             "email": "aman@gmail.com",
-            "password": "aman123"
+            "password": "pass-aman123"
         })
         resp = await client.get("/api/admin/stats")
         assert resp.status_code == 403
@@ -89,7 +114,7 @@ async def test_admin_stats_success():
         # Login as admin
         await client.post("/api/auth/login", json={
             "email": "hod@gmail.com",
-            "password": "hod123"
+            "password": "pass-hod123"
         })
         resp = await client.get("/api/admin/stats")
         assert resp.status_code == 200
@@ -103,7 +128,7 @@ async def test_admin_notice_crud():
         # Login as admin
         await client.post("/api/auth/login", json={
             "email": "hod@gmail.com",
-            "password": "hod123"
+            "password": "pass-hod123"
         })
 
         # 1. Create notice
@@ -134,11 +159,11 @@ async def test_admin_content_is_visible_to_students():
     student = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
     await admin.post("/api/auth/login", json={
         "email": "hod@gmail.com",
-        "password": "hod123",
+        "password": "pass-hod123",
     })
     await student.post("/api/auth/login", json={
         "email": "aman@gmail.com",
-        "password": "aman123",
+        "password": "pass-aman123",
     })
 
     notice = (await admin.post("/api/notices", json={
@@ -186,7 +211,7 @@ async def test_student_support_ticket_flow():
         # 1. Student creates ticket
         await client.post("/api/auth/login", json={
             "email": "aman@gmail.com",
-            "password": "aman123"
+            "password": "pass-aman123"
         })
         ticket_resp = await client.post("/api/support", json={
             "category": "Academic",
@@ -202,7 +227,7 @@ async def test_student_support_ticket_flow():
         # 2. Admin reviews and resolves ticket
         await client.post("/api/auth/login", json={
             "email": "hod@gmail.com",
-            "password": "hod123"
+            "password": "pass-hod123"
         })
         patch_resp = await client.patch(f"/api/support/{ticket_id}", json={
             "status": "resolved",
@@ -212,3 +237,23 @@ async def test_student_support_ticket_flow():
         resolved_ticket = patch_resp.json()
         assert resolved_ticket["status"] == "resolved"
         assert len(resolved_ticket["updates"]) == 2
+
+@pytest.mark.asyncio
+async def test_event_registration_response_and_cancellation():
+    event_id = "0b4fa307-fc14-5551-8d07-d034eeb3915a"
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        login = await client.post("/api/auth/login", json={
+            "email": "aman@gmail.com",
+            "password": "pass-aman123",
+        })
+        assert login.status_code == 200
+
+        registered = await client.post(f"/api/events/{event_id}/register")
+        assert registered.status_code == 200
+        assert registered.json()["status"] == "registered"
+        assert "registered" not in registered.json()
+        assert "title" not in registered.json()
+
+        cancelled = await client.delete(f"/api/events/{event_id}/register")
+        assert cancelled.status_code == 200
+        assert cancelled.json()["status"] == "unregistered"

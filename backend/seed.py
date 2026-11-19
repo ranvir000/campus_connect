@@ -24,11 +24,11 @@ async def seed_database(force: bool = False):
     # deployment receives the current viva credentials without losing data.
     await db.users.update_one(
         {"id": "7f769313-537d-552f-9e77-5b315efb2559"},
-        {"$set": {"email": "aman@gmail.com", "password_hash": hash_password("aman123")}},
+        {"$set": {"email": "aman@gmail.com", "password_hash": hash_password("pass-aman123")}},
     )
     await db.users.update_one(
         {"id": "a2d35653-e0be-54d3-867d-4787e6d7cd1f"},
-        {"$set": {"email": "hod@gmail.com", "password_hash": hash_password("hod123")}},
+        {"$set": {"email": "hod@gmail.com", "password_hash": hash_password("pass-hod123")}},
     )
     if user_count > 0 and not force:
         print("[Seed] Database already seeded. Skipping initial seeding.")
@@ -41,7 +41,7 @@ async def seed_database(force: bool = False):
         "id": "7f769313-537d-552f-9e77-5b315efb2559",
         "name": "Amanpreet Singh",
         "email": "aman@gmail.com",
-        "password_hash": hash_password("aman123"),
+        "password_hash": hash_password("pass-aman123"),
         "role": "student",
         "roll_no": "2021CSE084",
         "branch": "B.Tech CSE",
@@ -57,7 +57,7 @@ async def seed_database(force: bool = False):
         "id": "a2d35653-e0be-54d3-867d-4787e6d7cd1f",
         "name": "Dr. Hardeep Singh",
         "email": "hod@gmail.com",
-        "password_hash": hash_password("hod123"),
+        "password_hash": hash_password("pass-hod123"),
         "role": "admin",
         "roll_no": "",
         "branch": "Computer Science & Engineering",

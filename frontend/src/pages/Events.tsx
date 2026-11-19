@@ -9,6 +9,7 @@ import { EmptyState, LoadError, PageHeader, Spinner } from "@/components/bits";
 import { apiErrorMessage, apiDelete, apiGet, apiPost } from "@/lib/api";
 import { fmtDateTime } from "@/lib/format";
 import { useSession } from "@/lib/session";
+import { eventRegistrationSuccessMessage } from "@/lib/eventRegistrationMessage";
 import type { CampusEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ const CLUBS = [
 ];
 
 const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+type EventRegistrationResponse = { status: string; registered_count: number };
 
 export default function Events() {
   const { data } = useSession();
@@ -34,11 +36,11 @@ export default function Events() {
   const rsvp = useMutation({
     mutationFn: ({ ev, register }: { ev: CampusEvent; register: boolean }) =>
       register
-        ? apiPost<CampusEvent>(`/events/${ev.id}/register`)
-        : apiDelete<CampusEvent>(`/events/${ev.id}/register`),
-    onSuccess: (updated) => {
+        ? apiPost<EventRegistrationResponse>(`/events/${ev.id}/register`)
+        : apiDelete<EventRegistrationResponse>(`/events/${ev.id}/register`),
+    onSuccess: (_updated, { ev, register }) => {
       void queryClient.invalidateQueries({ queryKey: ["events"] });
-      toast.success(updated.registered ? "You are registered" : `Registration cancelled for ${updated.title}`);
+      toast.success(eventRegistrationSuccessMessage(register, ev.title));
     },
     onError: (e) => toast.error(apiErrorMessage(e)),
   });
