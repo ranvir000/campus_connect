@@ -119,7 +119,7 @@ export default function Resources() {
                     </div>
                     <h3 className="font-heading text-base font-semibold leading-snug tracking-tight">{r.title}</h3>
                     <Badge variant="secondary" className="w-fit">{r.subject}</Badge>
-                    <p className="flex-1 text-sm text-muted-foreground">{r.description}</p>
+                    {r.description ? <p className="flex-1 text-sm text-muted-foreground">{r.description}</p> : null}
                     {r.url ? (
                       <a
                         href={r.url}

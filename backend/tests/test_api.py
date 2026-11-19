@@ -82,7 +82,7 @@ async def test_broken_seed_resource_links_are_retired_but_repaired_links_are_pre
     broken = await db.resources.find_one({"id": broken_id})
     repaired = await db.resources.find_one({"id": repaired_id})
     assert broken["url"] == ""
-    assert "has not uploaded" in broken["description"]
+    assert broken["description"] == ""
     assert repaired["url"] == repaired_url
 
 
