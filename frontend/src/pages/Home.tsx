@@ -252,39 +252,21 @@ export default function Home() {
 
       {/* viva band */}
       <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6">
-        <div className="grid items-center gap-8 rounded-2xl border border-border/70 bg-card p-8 lg:grid-cols-2">
+        <div className="flex flex-col items-start justify-between gap-6 rounded-2xl border border-border/70 bg-card p-8 sm:flex-row sm:items-center">
           <div>
             <p className="font-mono text-xs font-semibold uppercase tracking-wider text-[#D97706]">For the viva panel</p>
-            <h2 className="mt-2 font-heading text-3xl font-bold tracking-tight">Demo accounts are ready to present</h2>
-            <p className="mt-2 text-muted-foreground">
-              The portal ships with realistic department data. Sign in with either role and demonstrate the full
-              flow — notices, events, resources, support tickets and the Faculty Dashboard.
+            <h2 className="mt-2 font-heading text-3xl font-bold tracking-tight">Ready for a complete portal walkthrough</h2>
+            <p className="mt-2 max-w-2xl text-muted-foreground">
+              Explore realistic departmental data, student services, publishing workflows and role-based access from the secure sign-in page.
             </p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Card size="sm" className="bg-secondary/50">
-              <CardContent className="p-4">
-                <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Student</p>
-                <p className="mt-1 font-medium">aman@gmail.com</p>
-                <p className="text-xs text-muted-foreground">Use your assigned credentials on the sign-in screen.</p>
-              </CardContent>
-            </Card>
-            <Card size="sm" className="bg-secondary/50">
-              <CardContent className="p-4">
-                <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Faculty</p>
-                <p className="mt-1 font-medium">hod@gmail.com</p>
-                <p className="text-xs text-muted-foreground">Use your assigned credentials on the sign-in screen.</p>
-              </CardContent>
-            </Card>
-            <Card size="sm" className="bg-secondary/50"><CardContent className="p-4"><p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Site Admin</p><p className="mt-1 font-medium">Account provisioning</p><p className="text-xs text-muted-foreground">Credentials are provisioned securely by the institution.</p></CardContent></Card>
-            <Link
-              to="/login"
-              data-testid="landing-go-to-login-button"
-              className={buttonVariants({ variant: "default", size: "lg" }) + " sm:col-span-2"}
-            >
-              <LayoutDashboard className="size-4" /> Open the portal
-            </Link>
-          </div>
+          <Link
+            to="/login"
+            data-testid="landing-go-to-login-button"
+            className={buttonVariants({ variant: "default", size: "lg" }) + " shrink-0"}
+          >
+            <LayoutDashboard className="size-4" /> Open the portal
+          </Link>
         </div>
       </section>
 

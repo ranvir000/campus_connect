@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { GraduationCap, Loader2, LogIn, ShieldCheck } from "lucide-react";
+import { BookOpen, GraduationCap, Loader2, LogIn, ShieldCheck } from "lucide-react";
 import { apiErrorMessage, apiPost } from "@/lib/api";
 import { beginSession } from "@/lib/session";
 import type { SessionUser } from "@/lib/types";
@@ -84,12 +84,19 @@ export default function Login() {
           </CardHeader>
           <CardContent className="space-y-5">
             <Tabs value={role} onValueChange={switchRole}>
-              <TabsList data-testid="login-role-tabs" className="grid w-full grid-cols-3">
-                <TabsTrigger value="student" data-testid="login-tab-student">
-                  Student
+              <TabsList data-testid="login-role-tabs" className="grid h-auto w-full grid-cols-3 gap-1 rounded-xl p-1">
+                <TabsTrigger value="student" data-testid="login-tab-student" className="flex h-16 flex-col gap-1 rounded-lg text-xs">
+                  <GraduationCap className="size-4" />
+                  <span>Student</span>
                 </TabsTrigger>
-                <TabsTrigger value="faculty" data-testid="login-tab-faculty">Faculty</TabsTrigger>
-                <TabsTrigger value="site_admin" data-testid="login-tab-site-admin">Site Admin</TabsTrigger>
+                <TabsTrigger value="faculty" data-testid="login-tab-faculty" className="flex h-16 flex-col gap-1 rounded-lg text-xs">
+                  <BookOpen className="size-4" />
+                  <span>Faculty</span>
+                </TabsTrigger>
+                <TabsTrigger value="site_admin" data-testid="login-tab-admin" className="flex h-16 flex-col gap-1 rounded-lg text-xs">
+                  <ShieldCheck className="size-4" />
+                  <span>Admin</span>
+                </TabsTrigger>
               </TabsList>
             </Tabs>
 
@@ -132,7 +139,7 @@ export default function Login() {
                 ) : (
                   <LogIn className="size-4" />
                 )}
-                Sign in as {role === "faculty" ? "Faculty" : role === "site_admin" ? "Site Admin" : "Student"}
+                Sign in as {role === "faculty" ? "Faculty" : role === "site_admin" ? "Admin" : "Student"}
               </Button>
             </form>
 
