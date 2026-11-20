@@ -26,12 +26,14 @@ SAMPLE_PDF_URL = "/documents/sample.pdf"
 CALENDAR_RESOURCE_ID = "846d7dff-70ba-5595-82ce-b4961a74c6ad"
 CALENDAR_RESOURCE_TITLE = "Academic Calendar 2026-27"
 CALENDAR_PDF_URL = "/documents/academic-calendar-2026-27.pdf"
+SYLLABUS_RESOURCE_ID = "b19eb9f6-7162-5f46-bced-d128ad64520d"
+SYLLABUS_PDF_URL = "/documents/btech-cse-syllabus-2022-onwards.pdf"
 PDF_RESOURCE_KINDS = frozenset({"Calendar", "Policy", "Syllabus", "Lab Manual", "Previous Paper"})
 
 RESOURCE_DESCRIPTIONS = {
     "Academic Calendar 2026-27": "Officially notified academic calendar covering session dates, mid-semester tests, end-semester examinations, and vacation periods for 2026-27.",
     "Anti-Ragging Guidelines & Helpline Booklet": "Guidelines, reporting channels, helpline contacts, and student protections related to ragging prevention.",
-    "B.Tech CSE 8th Semester Syllabus (CS-801–805)": "Course-wise syllabus outline, credits, units, and academic outcomes for CS-801 through CS-805.",
+    "B.Tech CSE 8th Semester Syllabus (CS-801–805)": "Official B.Tech CSE syllabus for the 2022 batch onwards, covering semesters 1–8 with revised course outcomes and program outcomes.",
     "Cloud Computing Practical Workbook (CS-802)": "Practical exercises, lab objectives, and submission guidance for CS-802 Cloud Computing.",
     "Machine Learning Lab Manual (CS-801)": "Experiments, algorithms, datasets, and practical assessment guidance for CS-801 Machine Learning.",
     "Previous Year Question Papers — 8th Sem CSE": "Past examination papers for 8th-semester CSE subjects to support revision and exam preparation.",
@@ -45,6 +47,8 @@ for resource in INITIAL_RESOURCES:
         if resource["id"] == CALENDAR_RESOURCE_ID:
             resource["title"] = CALENDAR_RESOURCE_TITLE
             resource["url"] = CALENDAR_PDF_URL
+        elif resource["id"] == SYLLABUS_RESOURCE_ID:
+            resource["url"] = SYLLABUS_PDF_URL
         else:
             resource["url"] = SAMPLE_PDF_URL
         resource["description"] = resource_description(resource["title"])
@@ -105,6 +109,13 @@ async def seed_database(force: bool = False):
             "title": CALENDAR_RESOURCE_TITLE,
             "url": CALENDAR_PDF_URL,
             "description": resource_description(CALENDAR_RESOURCE_TITLE),
+        }},
+    )
+    await db.resources.update_one(
+        {"id": SYLLABUS_RESOURCE_ID},
+        {"$set": {
+            "url": SYLLABUS_PDF_URL,
+            "description": resource_description("B.Tech CSE 8th Semester Syllabus (CS-801–805)"),
         }},
     )
     # Attach the shared sample only where a PDF-type resource has no working
