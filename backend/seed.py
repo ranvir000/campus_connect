@@ -26,7 +26,7 @@ SAMPLE_PDF_URL = "/documents/sample.pdf"
 PDF_RESOURCE_KINDS = frozenset({"Calendar", "Policy", "Syllabus", "Lab Manual", "Previous Paper"})
 
 def placeholder_pdf_description(title: str) -> str:
-    return "Information regarding the resource."
+    return "Actual information regarding the resource."
 
 for resource in INITIAL_RESOURCES:
     if resource.get("kind") in PDF_RESOURCE_KINDS:
