@@ -270,6 +270,9 @@ async def test_student_support_ticket_flow():
         resolved_ticket = patch_resp.json()
         assert resolved_ticket["status"] == "resolved"
         assert len(resolved_ticket["updates"]) == 2
+        delete_resp = await client.delete(f"/api/support/{ticket_id}")
+        assert delete_resp.status_code == 200
+        assert delete_resp.json()["status"] == "deleted"
 
 @pytest.mark.asyncio
 async def test_event_registration_response_and_cancellation():

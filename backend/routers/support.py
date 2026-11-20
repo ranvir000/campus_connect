@@ -91,3 +91,13 @@ async def update_ticket_status(
     )
 
     return SupportTicket(**ticket)
+
+@router.delete("/{ticket_id}")
+async def delete_ticket(
+    ticket_id: str,
+    admin: dict = Depends(require_faculty),
+):
+    result = await db.support_tickets.delete_one({"id": ticket_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Support ticket not found")
+    return {"status": "deleted", "id": ticket_id}
