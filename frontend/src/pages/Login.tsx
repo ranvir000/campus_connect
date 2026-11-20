@@ -84,16 +84,16 @@ export default function Login() {
           </CardHeader>
           <CardContent className="space-y-5">
             <Tabs value={role} onValueChange={switchRole}>
-              <TabsList data-testid="login-role-tabs" className="grid h-auto w-full grid-cols-3 gap-1 rounded-xl p-1">
-                <TabsTrigger value="student" data-testid="login-tab-student" className="flex h-16 flex-col gap-1 rounded-lg text-xs">
+              <TabsList data-testid="login-role-tabs" className="!h-auto min-h-20 w-full grid-cols-3 gap-1 rounded-xl p-1">
+                <TabsTrigger value="student" data-testid="login-tab-student" className="flex h-16 min-w-0 flex-col gap-1 rounded-lg text-xs">
                   <GraduationCap className="size-4" />
                   <span>Student</span>
                 </TabsTrigger>
-                <TabsTrigger value="faculty" data-testid="login-tab-faculty" className="flex h-16 flex-col gap-1 rounded-lg text-xs">
+                <TabsTrigger value="faculty" data-testid="login-tab-faculty" className="flex h-16 min-w-0 flex-col gap-1 rounded-lg text-xs">
                   <BookOpen className="size-4" />
                   <span>Faculty</span>
                 </TabsTrigger>
-                <TabsTrigger value="site_admin" data-testid="login-tab-admin" className="flex h-16 flex-col gap-1 rounded-lg text-xs">
+                <TabsTrigger value="site_admin" data-testid="login-tab-admin" className="flex h-16 min-w-0 flex-col gap-1 rounded-lg text-xs">
                   <ShieldCheck className="size-4" />
                   <span>Admin</span>
                 </TabsTrigger>
