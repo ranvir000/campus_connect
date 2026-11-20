@@ -6,7 +6,7 @@ from httpx import AsyncClient, ASGITransport
 from backend.server import app
 from backend.lib.db import db
 from backend.lib.auth import hash_password
-from backend.seed import seed_database, LEGACY_RESOURCE_URLS, PDF_RESOURCE_KINDS, SAMPLE_PDF_URL
+from backend.seed import seed_database, LEGACY_RESOURCE_URLS, PDF_RESOURCE_KINDS, SAMPLE_PDF_URL, CALENDAR_PDF_URL
 
 @pytest.fixture(autouse=True)
 async def setup_db():
@@ -85,8 +85,9 @@ async def test_broken_seed_resource_links_get_placeholder_and_repaired_links_are
 
     broken = await db.resources.find_one({"id": broken_id})
     repaired = await db.resources.find_one({"id": repaired_id})
-    assert broken["url"] == SAMPLE_PDF_URL
-    assert broken["description"] == "Important academic dates, holidays, examination windows, and semester milestones for the 2025–26 even semester."
+    assert broken["url"] == CALENDAR_PDF_URL
+    assert broken["title"] == "Academic Calendar 2026-27"
+    assert broken["description"].startswith("Officially notified academic calendar")
     assert "placeholder" not in broken["description"].lower()
     assert "sample" not in broken["description"].lower()
     assert repaired["url"] == repaired_url
@@ -97,9 +98,9 @@ async def test_all_pdf_resources_use_labeled_pdf_but_web_links_do_not():
     pdfs = [resource for resource in resources if resource.get("kind") in PDF_RESOURCE_KINDS]
     web_links = [resource for resource in resources if resource.get("kind") == "Link"]
     assert len(pdfs) == 6
-    assert all(resource["url"] == SAMPLE_PDF_URL for resource in pdfs)
+    assert all(resource["url"] == (CALENDAR_PDF_URL if resource["title"] == "Academic Calendar 2026-27" else SAMPLE_PDF_URL) for resource in pdfs)
     descriptions = {resource["title"]: resource["description"] for resource in pdfs}
-    assert descriptions["Academic Calendar 2025-26 (Even Semester)"].startswith("Important academic dates")
+    assert descriptions["Academic Calendar 2026-27"].startswith("Officially notified academic calendar")
     assert descriptions["Anti-Ragging Guidelines & Helpline Booklet"].startswith("Guidelines, reporting channels")
     assert descriptions["B.Tech CSE 8th Semester Syllabus (CS-801–805)"].startswith("Course-wise syllabus outline")
     assert descriptions["Cloud Computing Practical Workbook (CS-802)"].startswith("Practical exercises")
