@@ -1,4 +1,5 @@
 import os
+import uuid
 os.environ.setdefault("SITE_ADMIN_BOOTSTRAP_PASSWORD", "test-site-admin-password")
 import pytest
 from httpx import AsyncClient, ASGITransport
@@ -295,22 +296,24 @@ async def test_site_admin_bootstrap_and_account_management_security():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as admin:
         login = await admin.post("/api/auth/login", json={"email": "admin@gmail.com", "password": "test-site-admin-password"})
         assert login.status_code == 200 and login.json()["role"] == "site_admin"
-        created = await admin.post("/api/site-admin/accounts", json={"name":"New Student", "email":"  New.Student@example.com ", "password":"long-password", "role":"student", "roll_no":"R100"})
+        student_email = f"new.student.{uuid.uuid4().hex}@example.com"
+        faculty_email = f"faculty.{uuid.uuid4().hex}@example.com"
+        created = await admin.post("/api/site-admin/accounts", json={"name":"New Student", "email":f"  {student_email} ", "password":"long-password", "role":"student", "roll_no":"R100"})
         assert created.status_code == 200
         data = created.json()
-        assert data["email"] == "new.student@example.com" and "password_hash" not in data and "password" not in data
-        assert (await admin.post("/api/site-admin/accounts", json={"name":"Dup", "email":"NEW.STUDENT@example.com", "password":"long-password", "role":"student", "roll_no":"R101"})).status_code == 409
-        faculty = await admin.post("/api/site-admin/accounts", json={"name":"Faculty X", "email":"faculty.x@example.com", "password":"long-password", "role":"faculty"})
+        assert data["email"] == student_email and "password_hash" not in data and "password" not in data
+        assert (await admin.post("/api/site-admin/accounts", json={"name":"Dup", "email":student_email.upper(), "password":"long-password", "role":"student", "roll_no":"R101"})).status_code == 409
+        faculty = await admin.post("/api/site-admin/accounts", json={"name":"Faculty X", "email":faculty_email, "password":"long-password", "role":"faculty"})
         assert faculty.status_code == 200 and "password_hash" not in faculty.json()
         assert (await admin.patch(f"/api/site-admin/accounts/{faculty.json()['id']}/status", json={"is_active":False})).status_code == 403
         assert (await admin.delete(f"/api/site-admin/accounts/{faculty.json()['id']}")).status_code == 403
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as student:
-            student_login = await student.post("/api/auth/login", json={"email":"new.student@example.com", "password":"long-password"})
+            student_login = await student.post("/api/auth/login", json={"email":student_email, "password":"long-password"})
             assert student_login.status_code == 200
             token = student_login.cookies["session_token"]
             assert (await admin.patch(f"/api/site-admin/accounts/{data['id']}/status", json={"is_active":False})).status_code == 200
             assert (await student.get("/api/auth/me")).json()["user"] is None
-            assert (await student.post("/api/auth/login", json={"email":"new.student@example.com", "password":"long-password"})).status_code == 401
+            assert (await student.post("/api/auth/login", json={"email":student_email, "password":"long-password"})).status_code == 401
             assert (await admin.delete(f"/api/site-admin/accounts/{data['id']}" )).status_code == 200
 
 @pytest.mark.asyncio
