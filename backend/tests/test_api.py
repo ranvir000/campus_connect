@@ -86,18 +86,20 @@ async def test_broken_seed_resource_links_get_placeholder_and_repaired_links_are
     broken = await db.resources.find_one({"id": broken_id})
     repaired = await db.resources.find_one({"id": repaired_id})
     assert broken["url"] == SAMPLE_PDF_URL
-    assert "placeholder pdf" in broken["description"].lower()
+    assert "pdf only" in broken["description"].lower()
+    assert "placeholder" not in broken["description"].lower()
     assert "sample" not in broken["description"].lower()
     assert repaired["url"] == repaired_url
 
 @pytest.mark.asyncio
-async def test_all_pdf_resources_use_labeled_placeholder_but_web_links_do_not():
+async def test_all_pdf_resources_use_labeled_pdf_but_web_links_do_not():
     resources = await db.resources.find().to_list(100)
     pdfs = [resource for resource in resources if resource.get("kind") in PDF_RESOURCE_KINDS]
     web_links = [resource for resource in resources if resource.get("kind") == "Link"]
     assert len(pdfs) == 6
     assert all(resource["url"] == SAMPLE_PDF_URL for resource in pdfs)
-    assert all("placeholder pdf" in resource["description"].lower() for resource in pdfs)
+    assert all("pdf only" in resource["description"].lower() for resource in pdfs)
+    assert all("placeholder" not in resource["description"].lower() for resource in pdfs)
     assert all("sample" not in resource["description"].lower() for resource in pdfs)
     assert len(web_links) == 2
     assert all(resource["url"] != SAMPLE_PDF_URL for resource in web_links)

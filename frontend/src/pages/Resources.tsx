@@ -120,7 +120,7 @@ export default function Resources() {
                       </span>
                       <Badge variant="outline">{r.kind}</Badge>
                     </div>
-                    {isPlaceholderSample ? <Badge variant="outline" className="w-fit border-amber-500/50 text-amber-800 dark:text-amber-300">Placeholder PDF</Badge> : null}
+                    {isPlaceholderSample ? <Badge variant="outline" className="w-fit border-amber-500/50 text-amber-800 dark:text-amber-300">PDF</Badge> : null}
                     <h3 className="font-heading text-base font-semibold leading-snug tracking-tight">{r.title}</h3>
                     <Badge variant="secondary" className="w-fit">{r.subject}</Badge>
                     {r.url && r.description ? <p className="flex-1 text-sm text-muted-foreground">{r.description}</p> : null}
@@ -132,7 +132,7 @@ export default function Resources() {
                         data-testid={`resource-open-${r.id}`}
                         className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
                       >
-                        {isPlaceholderSample ? "Open placeholder PDF" : "Open resource"} <ExternalLink className="size-3.5" />
+                        {isPlaceholderSample ? "Open PDF" : "Open resource"} <ExternalLink className="size-3.5" />
                       </a>
                     ) : (
                       <div className="mt-1 rounded-md border border-dashed bg-muted/40 p-3" data-testid={`resource-unavailable-${r.id}`}>
