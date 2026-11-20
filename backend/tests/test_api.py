@@ -5,7 +5,7 @@ from httpx import AsyncClient, ASGITransport
 from backend.server import app
 from backend.lib.db import db
 from backend.lib.auth import hash_password
-from backend.seed import seed_database, LEGACY_RESOURCE_URLS
+from backend.seed import seed_database, LEGACY_RESOURCE_URLS, PDF_RESOURCE_KINDS, SAMPLE_PDF_URL
 
 @pytest.fixture(autouse=True)
 async def setup_db():
@@ -72,7 +72,7 @@ async def test_seed_migrates_existing_demo_passwords():
         assert faculty_old.json()["role"] == "faculty"
 
 @pytest.mark.asyncio
-async def test_broken_seed_resource_links_are_retired_but_repaired_links_are_preserved():
+async def test_broken_seed_resource_links_get_placeholder_and_repaired_links_are_preserved():
     entries = list(LEGACY_RESOURCE_URLS.items())
     broken_id, broken_url = entries[0]
     repaired_id, _ = entries[1]
@@ -84,9 +84,20 @@ async def test_broken_seed_resource_links_are_retired_but_repaired_links_are_pre
 
     broken = await db.resources.find_one({"id": broken_id})
     repaired = await db.resources.find_one({"id": repaired_id})
-    assert broken["url"] == ""
-    assert broken["description"] == ""
+    assert broken["url"] == SAMPLE_PDF_URL
+    assert "placeholder sample pdf" in broken["description"].lower()
     assert repaired["url"] == repaired_url
+
+@pytest.mark.asyncio
+async def test_all_pdf_resources_use_labeled_sample_but_web_links_do_not():
+    resources = await db.resources.find().to_list(100)
+    pdfs = [resource for resource in resources if resource.get("kind") in PDF_RESOURCE_KINDS]
+    web_links = [resource for resource in resources if resource.get("kind") == "Link"]
+    assert len(pdfs) == 6
+    assert all(resource["url"] == SAMPLE_PDF_URL for resource in pdfs)
+    assert all("placeholder sample pdf" in resource["description"].lower() for resource in pdfs)
+    assert len(web_links) == 2
+    assert all(resource["url"] != SAMPLE_PDF_URL for resource in web_links)
 
 
 @pytest.mark.asyncio

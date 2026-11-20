@@ -35,6 +35,8 @@ const KIND_ICONS: Record<string, typeof FileText> = {
   Link: Link2,
 };
 
+const PLACEHOLDER_SAMPLE_URL = "/documents/sample.pdf";
+
 const CONTACTS = [
   { name: "HOD Office — Dr. Hardeep Singh", detail: "hod@gmail.com", note: "Room A-201, CS Block • Mon–Fri 10 AM–4 PM", icon: Mail },
   { name: "Examination Cell", detail: "exam.cse@mrsptu.ac.in", note: "Ext. 234 • Hall tickets & form corrections", icon: Phone },
@@ -108,6 +110,7 @@ export default function Resources() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="resources-list">
             {resources.map((r) => {
               const Icon = KIND_ICONS[r.kind] ?? FileText;
+              const isPlaceholderSample = r.url === PLACEHOLDER_SAMPLE_URL;
               return (
                 <Card key={r.id} data-testid={`resource-card-${r.id}`} className="flex flex-col transition-all hover:-translate-y-0.5 hover:shadow-md">
                   <CardContent className="flex flex-1 flex-col gap-2">
@@ -117,6 +120,7 @@ export default function Resources() {
                       </span>
                       <Badge variant="outline">{r.kind}</Badge>
                     </div>
+                    {isPlaceholderSample ? <Badge variant="outline" className="w-fit border-amber-500/50 text-amber-800 dark:text-amber-300">Placeholder sample PDF</Badge> : null}
                     <h3 className="font-heading text-base font-semibold leading-snug tracking-tight">{r.title}</h3>
                     <Badge variant="secondary" className="w-fit">{r.subject}</Badge>
                     {r.url && r.description ? <p className="flex-1 text-sm text-muted-foreground">{r.description}</p> : null}
@@ -128,7 +132,7 @@ export default function Resources() {
                         data-testid={`resource-open-${r.id}`}
                         className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
                       >
-                        Open resource <ExternalLink className="size-3.5" />
+                        {isPlaceholderSample ? "Open placeholder sample PDF" : "Open resource"} <ExternalLink className="size-3.5" />
                       </a>
                     ) : (
                       <div className="mt-1 rounded-md border border-dashed bg-muted/40 p-3" data-testid={`resource-unavailable-${r.id}`}>
