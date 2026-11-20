@@ -86,7 +86,7 @@ async def test_broken_seed_resource_links_get_placeholder_and_repaired_links_are
     broken = await db.resources.find_one({"id": broken_id})
     repaired = await db.resources.find_one({"id": repaired_id})
     assert broken["url"] == SAMPLE_PDF_URL
-    assert broken["description"] == "Actual information regarding the resource."
+    assert broken["description"] == "Important academic dates, holidays, examination windows, and semester milestones for the 2025–26 even semester."
     assert "placeholder" not in broken["description"].lower()
     assert "sample" not in broken["description"].lower()
     assert repaired["url"] == repaired_url
@@ -98,7 +98,14 @@ async def test_all_pdf_resources_use_labeled_pdf_but_web_links_do_not():
     web_links = [resource for resource in resources if resource.get("kind") == "Link"]
     assert len(pdfs) == 6
     assert all(resource["url"] == SAMPLE_PDF_URL for resource in pdfs)
-    assert all(resource["description"] == "Actual information regarding the resource." for resource in pdfs)
+    descriptions = {resource["title"]: resource["description"] for resource in pdfs}
+    assert descriptions["Academic Calendar 2025-26 (Even Semester)"].startswith("Important academic dates")
+    assert descriptions["Anti-Ragging Guidelines & Helpline Booklet"].startswith("Guidelines, reporting channels")
+    assert descriptions["B.Tech CSE 8th Semester Syllabus (CS-801–805)"].startswith("Course-wise syllabus outline")
+    assert descriptions["Cloud Computing Practical Workbook (CS-802)"].startswith("Practical exercises")
+    assert descriptions["Machine Learning Lab Manual (CS-801)"].startswith("Experiments, algorithms")
+    assert descriptions["Previous Year Question Papers — 8th Sem CSE"].startswith("Past examination papers")
+    assert len(set(descriptions.values())) == len(descriptions)
     assert all("placeholder" not in resource["description"].lower() for resource in pdfs)
     assert all("sample" not in resource["description"].lower() for resource in pdfs)
     assert len(web_links) == 2

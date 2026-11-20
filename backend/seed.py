@@ -25,13 +25,22 @@ LEGACY_RESOURCE_URLS = {
 SAMPLE_PDF_URL = "/documents/sample.pdf"
 PDF_RESOURCE_KINDS = frozenset({"Calendar", "Policy", "Syllabus", "Lab Manual", "Previous Paper"})
 
-def placeholder_pdf_description(title: str) -> str:
-    return "Actual information regarding the resource."
+RESOURCE_DESCRIPTIONS = {
+    "Academic Calendar 2025-26 (Even Semester)": "Important academic dates, holidays, examination windows, and semester milestones for the 2025–26 even semester.",
+    "Anti-Ragging Guidelines & Helpline Booklet": "Guidelines, reporting channels, helpline contacts, and student protections related to ragging prevention.",
+    "B.Tech CSE 8th Semester Syllabus (CS-801–805)": "Course-wise syllabus outline, credits, units, and academic outcomes for CS-801 through CS-805.",
+    "Cloud Computing Practical Workbook (CS-802)": "Practical exercises, lab objectives, and submission guidance for CS-802 Cloud Computing.",
+    "Machine Learning Lab Manual (CS-801)": "Experiments, algorithms, datasets, and practical assessment guidance for CS-801 Machine Learning.",
+    "Previous Year Question Papers — 8th Sem CSE": "Past examination papers for 8th-semester CSE subjects to support revision and exam preparation.",
+}
+
+def resource_description(title: str) -> str:
+    return RESOURCE_DESCRIPTIONS.get(title, "Information regarding this resource.")
 
 for resource in INITIAL_RESOURCES:
     if resource.get("kind") in PDF_RESOURCE_KINDS:
         resource["url"] = SAMPLE_PDF_URL
-        resource["description"] = placeholder_pdf_description(resource["title"])
+        resource["description"] = resource_description(resource["title"])
 
 INITIAL_NOTICES = json.loads("[{\"id\": \"c748ba19-72f1-467d-9deb-dce370d5a938\", \"title\": \"Guest Lecture on Quantum Computing\", \"category\": \"Academic\", \"body\": \"Friday 11 AM, CS Auditorium.\", \"author\": \"Dr. Hardeep Singh\", \"published\": true, \"created_at\": \"2026-11-07T16:00:34.123696+05:30\"}, {\"id\": \"0a041ed7-cc3f-590a-972d-78db4e5f3fb7\", \"title\": \"Hands-on Workshop: Deep Learning with PyTorch (CSI Chapter)\", \"category\": \"Academic\", \"body\": \"The CSI Student Chapter is organizing a hands-on PyTorch workshop this Saturday, 10:00 AM in the AI Lab. Topics: tensors, autograd, training loops and deploying a small CNN. Bring your laptops; GPU instances will be provided. Limited to 40 seats \\u2014 register through the Events section of CampusConnect.\", \"author\": \"Dr. Hardeep Singh\", \"published\": true, \"created_at\": \"2026-11-07T08:00:00+05:30\"}, {\"id\": \"0a8c109e-5fd0-5286-8efc-ccb3b4a6464f\", \"title\": \"Major Project Viva Voce \\u2014 Panel Allotment & Reporting Time\", \"category\": \"Viva Voce\", \"body\": \"Panel allotment for the Major Project viva voce is now published on the department notice board. Amanpreet Singh (2021CSE084) is allotted Panel B, reporting 9:30 AM sharp with two printed copies of the final report. Presentation slot: 15 minutes, followed by a 10-minute question round. Demo setup must be ready 30 minutes before the slot.\", \"author\": \"Dr. Hardeep Singh\", \"published\": true, \"created_at\": \"2026-11-06T09:00:00+05:30\"}, {\"id\": \"7b5ce0df-318b-52ef-aeb8-e0c8b3d56613\", \"title\": \"Mid-Semester Examination Schedule \\u2014 8th Semester\", \"category\": \"Examination\", \"body\": \"The mid-semester examinations for the 8th semester begin next Monday. CS-801 Machine Learning (10 Mar, 10:00 AM, Exam Hall 1), CS-802 Cloud Computing (12 Mar, 10:00 AM, Exam Hall 1), CS-803 Cyber Forensics (14 Mar, 2:00 PM, Exam Hall 2). Students must carry their admit cards and university I-cards. No electronic devices are permitted inside the examination halls.\", \"author\": \"Dr. Hardeep Singh\", \"published\": true, \"created_at\": \"2026-11-05T10:00:00+05:30\"}, {\"id\": \"90246dcb-363e-54fa-948b-edcc1020aa04\", \"title\": \"TCS NQT Campus Drive \\u2014 Registration Open (CSE Final Year)\", \"category\": \"Placement\", \"body\": \"TCS NQT campus drive registrations are open for final-year CSE students with CGPA >= 7.0. Register on the TCS NextStep portal and submit the confirmation copy to the Training & Placement Cell by Friday, 4:00 PM. The online test is scheduled for the last week of this month at the university computing centre.\", \"author\": \"Dr. Hardeep Singh\", \"published\": true, \"created_at\": \"2026-11-04T11:00:00+05:30\"}, {\"id\": \"3da19d2b-5c91-582a-8258-ce000f4ef08a\", \"title\": \"Hostel Fee Payment Window \\u2014 Even Semester\", \"category\": \"Hostel\", \"body\": \"The even-semester hostel fee payment window is open until the end of this month via the MRSPTU ERP portal. Late payment attracts a \\u20b9100/day penalty after the deadline. Students facing payment issues may contact the hostel office (Room H-104) between 10:00 AM and 4:00 PM on working days.\", \"author\": \"Dr. Hardeep Singh\", \"published\": true, \"created_at\": \"2026-11-02T10:00:00+05:30\"}, {\"id\": \"ff65ca85-b1de-5426-9802-1eaa35c3488f\", \"title\": \"Annual Athletics Meet 2026 \\u2014 Registrations Close Friday\", \"category\": \"Sports\", \"body\": \"Registrations for the Annual Athletics Meet close this Friday. Events: 100m, 200m, 400m, relay, long jump and shot put. Register with your class representative or at the Sports Office. NCC/NSS volunteers will receive participation credit. Medical fitness certificates are mandatory for track events.\", \"author\": \"Dr. Hardeep Singh\", \"published\": true, \"created_at\": \"2026-10-31T12:00:00+05:30\"}]")
 
@@ -90,7 +99,7 @@ async def seed_database(force: bool = False):
                 {"id": resource["id"]},
                 {"$set": {
                     "url": SAMPLE_PDF_URL,
-                    "description": placeholder_pdf_description(resource.get("title", "resource")),
+                    "description": resource_description(resource.get("title", "resource")),
                 }},
             )
     if user_count > 0 and not force:
