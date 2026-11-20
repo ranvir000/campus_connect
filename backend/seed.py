@@ -28,6 +28,8 @@ CALENDAR_RESOURCE_TITLE = "Academic Calendar 2026-27"
 CALENDAR_PDF_URL = "/documents/academic-calendar-2026-27.pdf"
 SYLLABUS_RESOURCE_ID = "b19eb9f6-7162-5f46-bced-d128ad64520d"
 SYLLABUS_PDF_URL = "/documents/btech-cse-syllabus-2022-onwards.pdf"
+PYQ_RESOURCE_ID = "67fb951b-2f45-5b94-8a54-a6b4d924c050"
+PYQ_PDF_URL = "/documents/internet-of-things-8th-may-2024.pdf"
 PDF_RESOURCE_KINDS = frozenset({"Calendar", "Policy", "Syllabus", "Lab Manual", "Previous Paper"})
 
 RESOURCE_DESCRIPTIONS = {
@@ -36,7 +38,7 @@ RESOURCE_DESCRIPTIONS = {
     "B.Tech CSE 8th Semester Syllabus (CS-801–805)": "Official B.Tech CSE syllabus for the 2022 batch onwards, covering semesters 1–8 with revised course outcomes and program outcomes.",
     "Cloud Computing Practical Workbook (CS-802)": "Practical exercises, lab objectives, and submission guidance for CS-802 Cloud Computing.",
     "Machine Learning Lab Manual (CS-801)": "Experiments, algorithms, datasets, and practical assessment guidance for CS-801 Machine Learning.",
-    "Previous Year Question Papers — 8th Sem CSE": "Past examination papers for 8th-semester CSE subjects to support revision and exam preparation.",
+    "Previous Year Question Papers — 8th Sem CSE": "Internet of Things question paper for the 8th-semester examination held in May 2024.",
 }
 
 def resource_description(title: str) -> str:
@@ -49,6 +51,8 @@ for resource in INITIAL_RESOURCES:
             resource["url"] = CALENDAR_PDF_URL
         elif resource["id"] == SYLLABUS_RESOURCE_ID:
             resource["url"] = SYLLABUS_PDF_URL
+        elif resource["id"] == PYQ_RESOURCE_ID:
+            resource["url"] = PYQ_PDF_URL
         else:
             resource["url"] = SAMPLE_PDF_URL
         resource["description"] = resource_description(resource["title"])
@@ -116,6 +120,13 @@ async def seed_database(force: bool = False):
         {"$set": {
             "url": SYLLABUS_PDF_URL,
             "description": resource_description("B.Tech CSE 8th Semester Syllabus (CS-801–805)"),
+        }},
+    )
+    await db.resources.update_one(
+        {"id": PYQ_RESOURCE_ID},
+        {"$set": {
+            "url": PYQ_PDF_URL,
+            "description": resource_description("Previous Year Question Papers — 8th Sem CSE"),
         }},
     )
     # Attach the shared sample only where a PDF-type resource has no working
