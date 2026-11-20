@@ -16,12 +16,12 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const HERO_IMG =
   "https://images.unsplash.com/photo-1623631484725-fef26b75b402?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxjb2xsZWdlJTIwdW5pdmVyc2l0eSUyMGNhbXB1c3xlbnwwfHx8fDE3OTM5NzAzODd8MA&ixlib=rb-4.1.0&q=85";
 
-type Role = "student" | "admin";
+type Role = "student" | "faculty" | "site_admin";
 
 export default function Login() {
   const location = useLocation();
   const navigate = useNavigate();
-  const initialRole: Role = (location.state as { role?: string } | null)?.role === "admin" ? "admin" : "student";
+  const initialRole: Role = (["student", "faculty", "site_admin"].includes((location.state as { role?: string } | null)?.role ?? "") ? (location.state as { role: Role }).role : "student");
   const [role, setRole] = useState<Role>(initialRole);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +32,7 @@ export default function Login() {
       beginSession();
       toast.success(`Welcome, ${user.name}!`);
       const from = (location.state as { from?: string } | null)?.from;
-      const target = from && from !== "/login" ? from : user.role === "admin" ? "/admin" : "/dashboard";
+      const target = user.role === "site_admin" ? "/site-admin" : user.role === "faculty" ? "/faculty" : from && from !== "/login" ? from : "/dashboard";
       navigate(target, { replace: true });
     },
     onError: (e) => toast.error(apiErrorMessage(e)),
@@ -84,13 +84,12 @@ export default function Login() {
           </CardHeader>
           <CardContent className="space-y-5">
             <Tabs value={role} onValueChange={switchRole}>
-              <TabsList data-testid="login-role-tabs" className="grid w-full grid-cols-2">
+              <TabsList data-testid="login-role-tabs" className="grid w-full grid-cols-3">
                 <TabsTrigger value="student" data-testid="login-tab-student">
                   Student
                 </TabsTrigger>
-                <TabsTrigger value="admin" data-testid="login-tab-admin">
-                  Administrator
-                </TabsTrigger>
+                <TabsTrigger value="faculty" data-testid="login-tab-faculty">Faculty</TabsTrigger>
+                <TabsTrigger value="site_admin" data-testid="login-tab-site-admin">Site Admin</TabsTrigger>
               </TabsList>
             </Tabs>
 
@@ -128,12 +127,12 @@ export default function Login() {
               <Button type="submit" className="w-full" size="lg" disabled={!canSubmit} data-testid="login-submit-button">
                 {login.isPending ? (
                   <Loader2 className="size-4 animate-spin" />
-                ) : role === "admin" ? (
+                ) : role !== "student" ? (
                   <ShieldCheck className="size-4" />
                 ) : (
                   <LogIn className="size-4" />
                 )}
-                Sign in as {role === "admin" ? "Administrator" : "Student"}
+                Sign in as {role === "faculty" ? "Faculty" : role === "site_admin" ? "Site Admin" : "Student"}
               </Button>
             </form>
 

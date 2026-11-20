@@ -1,8 +1,10 @@
+export type UserRole = "student" | "faculty" | "site_admin";
+
 export interface SessionUser {
   id?: string;
   name: string;
   email: string;
-  role: "admin" | "student" | string;
+  role: UserRole;
   designation?: string;
   branch?: string;
   roll_no?: string;
@@ -10,6 +12,29 @@ export interface SessionUser {
   batch?: string;
   cgpa?: string | number;
   attendance?: string | number;
+}
+
+export interface AccountRecord {
+  id: string;
+  email: string;
+  name: string;
+  role: "student" | "faculty";
+  is_active: boolean;
+  designation?: string | null;
+  roll_no?: string | null;
+  branch?: string | null;
+  semester?: string | null;
+}
+
+export interface AccountCreateInput {
+  email: string;
+  name: string;
+  password: string;
+  role: "student" | "faculty";
+  roll_no?: string;
+  branch?: string;
+  semester?: string;
+  designation?: string;
 }
 
 export interface Subject {

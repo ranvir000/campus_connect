@@ -14,6 +14,7 @@ from routers.events import router as events_router
 from routers.resources import router as resources_router
 from routers.support import router as support_router
 from routers.admin import router as admin_router
+from routers.site_admin import router as site_admin_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -76,6 +77,7 @@ app.include_router(events_router)
 app.include_router(resources_router)
 app.include_router(support_router)
 app.include_router(admin_router)
+app.include_router(site_admin_router)
 
 @app.get("/api/health")
 async def health_check():

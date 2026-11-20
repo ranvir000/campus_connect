@@ -2,7 +2,7 @@ import uuid
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
 from lib.db import db
-from lib.auth import require_admin, get_current_user
+from lib.auth import require_faculty, get_current_user
 from lib.dates import iso_now
 from models.portal import Notice, NoticeCreate, NoticeUpdate
 
@@ -16,10 +16,10 @@ async def get_notices(
     user: Optional[dict] = Depends(get_current_user),
 ):
     query = {}
-    is_admin = user and user.get("role") == "admin"
+    is_faculty = user and user.get("role") == "faculty"
 
-    # Only admins requesting all=1 can see unpublished drafts
-    if not (is_admin and all == 1):
+    # Only Faculty requesting all=1 can see unpublished drafts
+    if not (is_faculty and all == 1):
         query["published"] = True
 
     if category and category.lower() != "all":
@@ -38,7 +38,7 @@ async def get_notices(
     return [Notice(**n) for n in notices]
 
 @router.post("", response_model=Notice)
-async def create_notice(payload: NoticeCreate, admin: dict = Depends(require_admin)):
+async def create_notice(payload: NoticeCreate, admin: dict = Depends(require_faculty)):
     notice_id = str(uuid.uuid4())
     notice = {
         "id": notice_id,
@@ -56,7 +56,7 @@ async def create_notice(payload: NoticeCreate, admin: dict = Depends(require_adm
 async def update_notice(
     notice_id: str,
     payload: NoticeUpdate,
-    admin: dict = Depends(require_admin),
+    admin: dict = Depends(require_faculty),
 ):
     notice = await db.notices.find_one({"id": notice_id})
     if not notice:
@@ -70,7 +70,7 @@ async def update_notice(
     return Notice(**notice)
 
 @router.delete("/{notice_id}")
-async def delete_notice(notice_id: str, admin: dict = Depends(require_admin)):
+async def delete_notice(notice_id: str, admin: dict = Depends(require_faculty)):
     res = await db.notices.delete_one({"id": notice_id})
     if res.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Notice not found")

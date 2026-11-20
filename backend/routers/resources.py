@@ -2,7 +2,7 @@ import uuid
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
 from lib.db import db
-from lib.auth import require_admin
+from lib.auth import require_faculty
 from lib.dates import iso_now
 from models.portal import Resource, ResourceCreate, ResourceUpdate
 
@@ -19,7 +19,7 @@ async def get_resources(kind: Optional[str] = Query(None)):
     return [Resource(**r) for r in resources]
 
 @router.post("", response_model=Resource)
-async def create_resource(payload: ResourceCreate, admin: dict = Depends(require_admin)):
+async def create_resource(payload: ResourceCreate, admin: dict = Depends(require_faculty)):
     res_id = str(uuid.uuid4())
     resource = {
         "id": res_id,
@@ -37,7 +37,7 @@ async def create_resource(payload: ResourceCreate, admin: dict = Depends(require
 async def update_resource(
     resource_id: str,
     payload: ResourceUpdate,
-    admin: dict = Depends(require_admin),
+    admin: dict = Depends(require_faculty),
 ):
     resource = await db.resources.find_one({"id": resource_id})
     if not resource:
@@ -51,7 +51,7 @@ async def update_resource(
     return Resource(**resource)
 
 @router.delete("/{resource_id}")
-async def delete_resource(resource_id: str, admin: dict = Depends(require_admin)):
+async def delete_resource(resource_id: str, admin: dict = Depends(require_faculty)):
     res = await db.resources.delete_one({"id": resource_id})
     if res.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Resource not found")

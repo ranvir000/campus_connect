@@ -21,7 +21,7 @@ import { useDarkTheme } from "@/lib/theme";
 export default function Profile() {
   const { data } = useSession();
   const user = data?.user ?? null;
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "faculty";
 
   const [dark, setDark] = useDarkTheme();
   type Prefs = { notices: boolean; events: boolean; support: boolean };
@@ -74,7 +74,7 @@ export default function Profile() {
           </div>
           <Badge className="border-transparent bg-[#DBEAFE] text-[#1E3A8A] dark:bg-[#1E3A8A]/40 dark:text-[#BFDBFE]">
             {isAdmin ? <ShieldCheck className="size-3" /> : <GraduationCap className="size-3" />}
-            {isAdmin ? "Administrator" : "Student"}
+            {isAdmin ? "Faculty" : "Student"}
           </Badge>
         </CardContent>
       </Card>

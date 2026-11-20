@@ -29,21 +29,23 @@ const STUDENT_NAV = [
   { to: "/profile", label: "Profile", icon: UserCircle },
 ];
 
-const ADMIN_NAV = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/admin/notices", label: "Notices", icon: Bell },
-  { to: "/admin/events", label: "Events", icon: CalendarDays },
-  { to: "/admin/resources", label: "Resources", icon: FolderOpen },
-  { to: "/admin/support", label: "Support", icon: LifeBuoy },
+const FACULTY_NAV = [
+  { to: "/faculty", label: "Faculty Dashboard", icon: LayoutDashboard },
+  { to: "/faculty/notices", label: "Notices", icon: Bell },
+  { to: "/faculty/events", label: "Events", icon: CalendarDays },
+  { to: "/faculty/resources", label: "Resources", icon: FolderOpen },
+  { to: "/faculty/support", label: "Support", icon: LifeBuoy },
   { to: "/profile", label: "Profile", icon: UserCircle },
 ];
+
+const SITE_ADMIN_NAV = [{ to: "/site-admin", label: "Accounts", icon: UserCircle }];
 
 const slug = (label: string) => label.toLowerCase().replace(/\s+/g, "-");
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const { data } = useSession();
   const user = data?.user ?? null;
-  const nav = user?.role === "admin" ? ADMIN_NAV : STUDENT_NAV;
+  const nav = user?.role === "site_admin" ? SITE_ADMIN_NAV : user?.role === "faculty" ? FACULTY_NAV : STUDENT_NAV;
 
   const [dark, setDark] = useDarkTheme();
 
@@ -71,7 +73,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       >
         <div className="mx-auto flex h-14 w-full max-w-7xl items-center gap-3 px-4 sm:px-6">
           <Link
-            to={user.role === "admin" ? "/admin" : "/dashboard"}
+            to={user.role === "site_admin" ? "/site-admin" : user.role === "faculty" ? "/faculty" : "/dashboard"}
             data-testid="app-brand-link"
             className="flex items-center gap-2"
           >
@@ -80,14 +82,14 @@ export default function AppShell({ children }: { children: ReactNode }) {
             </span>
             <span className="font-heading text-base font-bold tracking-tight">CampusConnect</span>
             <Badge variant="secondary" className="ml-1 hidden sm:inline-flex">
-              {user.role === "admin" ? "Admin Console" : "Student Portal"}
+              {user.role === "site_admin" ? "Site Admin" : user.role === "faculty" ? "Faculty Dashboard" : "Student Portal"}
             </Badge>
           </Link>
           <div className="ml-auto flex items-center gap-1.5">
             <div className="mr-1 hidden text-right md:block" data-testid="header-user-chip">
               <p className="text-sm font-semibold leading-tight">{user.name}</p>
               <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                {user.role === "admin" ? user.designation || "Administrator" : user.roll_no}
+                {user.role === "faculty" ? user.designation || "Faculty" : user.role === "site_admin" ? "Account management" : user.roll_no}
               </p>
             </div>
             <Button variant="ghost" size="icon" data-testid="theme-toggle-button" onClick={() => setDark(!dark)} aria-label="Toggle theme">
@@ -104,7 +106,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <aside className="sticky top-20 hidden h-fit w-52 shrink-0 lg:block">
           <nav data-testid="app-sidebar" className="flex flex-col gap-1">
             {nav.map(({ to, label, icon: Icon }) => (
-              <NavLink key={to} to={to} data-testid={`nav-${slug(label)}`} className={sidebarCls} end={to === "/admin"}>
+              <NavLink key={to} to={to} data-testid={`nav-${slug(label)}`} className={sidebarCls} end={to === "/faculty" || to === "/site-admin"}>
                 <Icon className="size-4" />
                 {label}
               </NavLink>
@@ -119,7 +121,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         className="fixed inset-x-0 bottom-0 z-40 flex overflow-x-auto border-t border-border/70 bg-white/95 backdrop-blur-xl dark:bg-slate-950/95 lg:hidden"
       >
         {nav.map(({ to, label, icon: Icon }) => (
-          <NavLink key={to} to={to} data-testid={`nav-mobile-${slug(label)}`} className={mobileCls} end={to === "/admin"}>
+          <NavLink key={to} to={to} data-testid={`nav-mobile-${slug(label)}`} className={mobileCls} end={to === "/faculty" || to === "/site-admin"}>
             <Icon className="size-5" />
             {label}
           </NavLink>

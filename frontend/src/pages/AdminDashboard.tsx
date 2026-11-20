@@ -48,7 +48,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Admin Console — ${user?.name ?? "Department"}`}
+        title={`Faculty Dashboard — ${user?.name ?? "Department"}`}
         description="CSE department overview: publications, events and student helpdesk at a glance."
       />
 
@@ -86,10 +86,10 @@ export default function AdminDashboard() {
       {/* quick actions */}
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { to: "/admin/notices", label: "Publish a notice", icon: Plus, testid: "admin-quick-notice" },
-          { to: "/admin/events", label: "Add an event", icon: Plus, testid: "admin-quick-event" },
-          { to: "/admin/resources", label: "Add a resource", icon: FolderOpen, testid: "admin-quick-resource" },
-          { to: "/admin/support", label: "Resolve tickets", icon: ShieldCheck, testid: "admin-quick-support" },
+          { to: "/faculty/notices", label: "Publish a notice", icon: Plus, testid: "admin-quick-notice" },
+          { to: "/faculty/events", label: "Add an event", icon: Plus, testid: "admin-quick-event" },
+          { to: "/faculty/resources", label: "Add a resource", icon: FolderOpen, testid: "admin-quick-resource" },
+          { to: "/faculty/support", label: "Resolve tickets", icon: ShieldCheck, testid: "admin-quick-support" },
         ].map(({ to, label, icon: Icon, testid }) => (
           <Link key={to} to={to} data-testid={testid} className={buttonVariants({ variant: "outline" }) + " justify-start"}>
             <Icon className="size-4 text-primary" /> {label}
@@ -105,7 +105,7 @@ export default function AdminDashboard() {
               <CardTitle className="font-heading">Recent notices</CardTitle>
               <CardDescription>Published & drafts</CardDescription>
             </div>
-            <Link to="/admin/notices" data-testid="admin-view-notices-link" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+            <Link to="/faculty/notices" data-testid="admin-view-notices-link" className={buttonVariants({ variant: "ghost", size: "sm" })}>
               Manage <ArrowRight className="size-4" />
             </Link>
           </CardHeader>
@@ -135,7 +135,7 @@ export default function AdminDashboard() {
               <CardTitle className="font-heading">Upcoming events</CardTitle>
               <CardDescription>Next on campus</CardDescription>
             </div>
-            <Link to="/admin/events" data-testid="admin-view-events-link" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+            <Link to="/faculty/events" data-testid="admin-view-events-link" className={buttonVariants({ variant: "ghost", size: "sm" })}>
               Manage <ArrowRight className="size-4" />
             </Link>
           </CardHeader>
@@ -166,7 +166,7 @@ export default function AdminDashboard() {
               <CardTitle className="font-heading">Helpdesk</CardTitle>
               <CardDescription>Latest student requests</CardDescription>
             </div>
-            <Link to="/admin/support" data-testid="admin-view-support-link" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+            <Link to="/faculty/support" data-testid="admin-view-support-link" className={buttonVariants({ variant: "ghost", size: "sm" })}>
               Manage <ArrowRight className="size-4" />
             </Link>
           </CardHeader>

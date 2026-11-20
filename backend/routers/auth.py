@@ -25,8 +25,8 @@ async def login(payload: LoginPayload, response: Response, request: Request):
     attempts = [stamp for stamp in _failed_logins.get(key, []) if now - stamp < _RATE_WINDOW_SECONDS]
     if len(attempts) >= _MAX_FAILED_ATTEMPTS:
         raise HTTPException(status_code=429, detail="Too many failed attempts. Try again in a few minutes.")
-    user = await db.users.find_one({"email": payload.email.lower()})
-    if not user or not verify_password(payload.password, user.get("password_hash", "")):
+    user = await db.users.find_one({"email": payload.email.strip().lower()})
+    if not user or user.get("is_active", True) is False or not verify_password(payload.password, user.get("password_hash", "")):
         attempts.append(now)
         _failed_logins[key] = attempts
         raise HTTPException(status_code=401, detail="Invalid email or password.")

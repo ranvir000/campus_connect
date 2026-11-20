@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from fastapi import APIRouter, Depends
 from lib.db import db
-from lib.auth import require_admin
+from lib.auth import require_faculty
 from lib.dates import is_past_date
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
@@ -16,7 +16,7 @@ class AdminStats(BaseModel):
     resources: int
 
 @router.get("/stats", response_model=AdminStats)
-async def get_admin_stats(admin: dict = Depends(require_admin)):
+async def get_admin_stats(admin: dict = Depends(require_faculty)):
     students_count = await db.users.count_documents({"role": "student"})
     notices_published = await db.notices.count_documents({"published": True})
     total_notices = await db.notices.count_documents({})

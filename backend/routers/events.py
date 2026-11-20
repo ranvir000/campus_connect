@@ -2,7 +2,7 @@ import uuid
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
 from lib.db import db
-from lib.auth import require_admin, require_user, get_current_user
+from lib.auth import require_faculty, require_student, get_current_user
 from lib.dates import iso_now, is_past_date
 from models.portal import Event, EventCreate, EventUpdate
 
@@ -43,7 +43,7 @@ async def get_events(
     return result
 
 @router.post("/{event_id}/register")
-async def register_event(event_id: str, user: dict = Depends(require_user)):
+async def register_event(event_id: str, user: dict = Depends(require_student)):
     event = await db.events.find_one({"id": event_id})
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -75,7 +75,7 @@ async def register_event(event_id: str, user: dict = Depends(require_user)):
     return {"status": "registered", "registered_count": count + 1}
 
 @router.delete("/{event_id}/register")
-async def cancel_registration(event_id: str, user: dict = Depends(require_user)):
+async def cancel_registration(event_id: str, user: dict = Depends(require_student)):
     await db.event_registrations.delete_many({
         "event_id": event_id,
         "student_id": user["id"],
@@ -84,7 +84,7 @@ async def cancel_registration(event_id: str, user: dict = Depends(require_user))
     return {"status": "unregistered", "registered_count": count}
 
 @router.post("", response_model=Event)
-async def create_event(payload: EventCreate, admin: dict = Depends(require_admin)):
+async def create_event(payload: EventCreate, admin: dict = Depends(require_faculty)):
     event_id = str(uuid.uuid4())
     event = {
         "id": event_id,
@@ -107,7 +107,7 @@ async def create_event(payload: EventCreate, admin: dict = Depends(require_admin
 async def update_event(
     event_id: str,
     payload: EventUpdate,
-    admin: dict = Depends(require_admin),
+    admin: dict = Depends(require_faculty),
 ):
     event = await db.events.find_one({"id": event_id})
     if not event:
@@ -126,7 +126,7 @@ async def update_event(
     return Event(**ev_dict)
 
 @router.delete("/{event_id}")
-async def delete_event(event_id: str, admin: dict = Depends(require_admin)):
+async def delete_event(event_id: str, admin: dict = Depends(require_faculty)):
     res = await db.events.delete_one({"id": event_id})
     if res.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Event not found")

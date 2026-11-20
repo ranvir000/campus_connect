@@ -98,8 +98,8 @@ export default function Events() {
                 {isRsvpPending ? "Registering…" : "Register"}
               </Button>
             )
-          ) : user?.role === "admin" ? (
-            <Link to="/admin/events" data-testid={`event-manage-link-${ev.id}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+          ) : user?.role === "faculty" ? (
+            <Link to="/faculty/events" data-testid={`event-manage-link-${ev.id}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
               Manage
             </Link>
           ) : (

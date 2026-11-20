@@ -1,4 +1,5 @@
 import json
+import os
 import asyncio
 from lib.db import db
 from lib.auth import hash_password
@@ -30,6 +31,30 @@ INITIAL_SUPPORT = json.loads("[{\"id\": \"9ca16b18-9d43-469d-ba5d-b6cc38e04fe6\"
 async def seed_database(force: bool = False):
     """Idempotently seed demo accounts and initial departmental data."""
     user_count = await db.users.count_documents({})
+    # Add the active flag without changing existing account state.
+    all_users = await db.users.find().to_list(10000)
+    for existing in all_users:
+        updates = {}
+        if "is_active" not in existing:
+            updates["is_active"] = True
+        if existing.get("role") == "admin":
+            updates["role"] = "faculty"
+        if updates:
+            await db.users.update_one({"id": existing["id"]}, {"$set": updates})
+    # Bootstrap is intentionally environment-only and never overwrites credentials.
+    bootstrap_password = os.getenv("SITE_ADMIN_BOOTSTRAP_PASSWORD")
+    if bootstrap_password:
+        site_admin = await db.users.find_one({"email": "admin@gmail.com"})
+        if not site_admin:
+            await db.users.insert_one({
+                "id": "site-admin-initial", "name": "Site Admin", "email": "admin@gmail.com",
+                "password_hash": hash_password(bootstrap_password), "role": "site_admin",
+                "roll_no": "", "branch": "", "semester": "", "batch": "", "cgpa": "",
+                "attendance": "", "designation": "", "is_active": True,
+            })
+        else:
+            updates = {"role": "site_admin", "is_active": site_admin.get("is_active", True)}
+            await db.users.update_one({"id": site_admin["id"]}, {"$set": updates})
     # Migrate the demo account credentials in place without replacing user data.
     await db.users.update_one(
         {"id": "7f769313-537d-552f-9e77-5b315efb2559"},
@@ -37,7 +62,7 @@ async def seed_database(force: bool = False):
     )
     await db.users.update_one(
         {"id": "a2d35653-e0be-54d3-867d-4787e6d7cd1f"},
-        {"$set": {"email": "hod@gmail.com", "password_hash": hash_password("hod123")}},
+        {"$set": {"email": "hod@gmail.com", "role": "faculty"}},
     )
     # Retire only the known broken sample URLs. If an admin has already replaced
     # one with a real source, this exact-match migration leaves that link intact.
@@ -59,6 +84,7 @@ async def seed_database(force: bool = False):
         "email": "aman@gmail.com",
         "password_hash": hash_password("aman123"),
         "role": "student",
+        "is_active": True,
         "roll_no": "2021CSE084",
         "branch": "B.Tech CSE",
         "semester": "8th Semester (Final Year)",
@@ -74,7 +100,8 @@ async def seed_database(force: bool = False):
         "name": "Dr. Hardeep Singh",
         "email": "hod@gmail.com",
         "password_hash": hash_password("hod123"),
-        "role": "admin",
+        "role": "faculty",
+        "is_active": True,
         "roll_no": "",
         "branch": "Computer Science & Engineering",
         "semester": "",

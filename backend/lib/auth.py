@@ -77,6 +77,9 @@ async def get_current_user(request: Request) -> Optional[dict]:
             return None
 
     user = await db.users.find_one({"id": session["user_id"]})
+    if not user or user.get("is_active", True) is False:
+        await delete_session(token)
+        return None
     return user
 
 async def require_user(user: Optional[dict] = Depends(get_current_user)) -> dict:
@@ -85,10 +88,15 @@ async def require_user(user: Optional[dict] = Depends(get_current_user)) -> dict
         raise HTTPException(status_code=401, detail="Authentication required. Please sign in.")
     return user
 
-async def require_admin(user: dict = Depends(require_user)) -> dict:
-    """Dependency that restricts access to administrators (403 if student)."""
-    if user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Forbidden: Administrator access required.")
+async def require_faculty(user: dict = Depends(require_user)) -> dict:
+    """Restrict content management to faculty."""
+    if user.get("role") != "faculty":
+        raise HTTPException(status_code=403, detail="Forbidden: Faculty access required.")
+    return user
+async def require_site_admin(user: dict = Depends(require_user)) -> dict:
+    """Restrict account administration to site administrators."""
+    if user.get("role") != "site_admin":
+        raise HTTPException(status_code=403, detail="Forbidden: Site Admin access required.")
     return user
 
 async def require_student(user: dict = Depends(require_user)) -> dict:

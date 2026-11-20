@@ -2,7 +2,7 @@ import uuid
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
 from lib.db import db
-from lib.auth import require_admin, require_user
+from lib.auth import require_faculty, require_student
 from lib.dates import iso_now
 from models.support import SupportTicket, SupportTicketCreate, SupportTicketPatch
 
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/api/support", tags=["support"])
 @router.post("", response_model=SupportTicket)
 async def create_support_ticket(
     payload: SupportTicketCreate,
-    user: dict = Depends(require_user),
+    user: dict = Depends(require_student),
 ):
     ticket_id = str(uuid.uuid4())
     now = iso_now()
@@ -39,7 +39,7 @@ async def create_support_ticket(
     return SupportTicket(**ticket)
 
 @router.get("/mine", response_model=List[SupportTicket])
-async def get_my_tickets(user: dict = Depends(require_user)):
+async def get_my_tickets(user: dict = Depends(require_student)):
     cursor = db.support_tickets.find({"student_id": user["id"]}).sort("created_at", -1)
     tickets = await cursor.to_list(100)
     return [SupportTicket(**t) for t in tickets]
@@ -47,7 +47,7 @@ async def get_my_tickets(user: dict = Depends(require_user)):
 @router.get("", response_model=List[SupportTicket])
 async def get_all_tickets(
     status: Optional[str] = Query(None),
-    admin: dict = Depends(require_admin),
+    admin: dict = Depends(require_faculty),
 ):
     query = {}
     if status and status.lower() != "all":
@@ -61,7 +61,7 @@ async def get_all_tickets(
 async def update_ticket_status(
     ticket_id: str,
     payload: SupportTicketPatch,
-    admin: dict = Depends(require_admin),
+    admin: dict = Depends(require_faculty),
 ):
     ticket = await db.support_tickets.find_one({"id": ticket_id})
     if not ticket:

@@ -1,3 +1,5 @@
+import os
+os.environ.setdefault("SITE_ADMIN_BOOTSTRAP_PASSWORD", "test-site-admin-password")
 import pytest
 from httpx import AsyncClient, ASGITransport
 from backend.server import app
@@ -24,7 +26,7 @@ async def test_student_login_success():
         assert "session_token" in resp.cookies
 
 @pytest.mark.asyncio
-async def test_admin_login_success():
+async def test_faculty_login_success():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post("/api/auth/login", json={
             "email": "hod@gmail.com",
@@ -33,7 +35,7 @@ async def test_admin_login_success():
         assert resp.status_code == 200
         data = resp.json()
         assert data["email"] == "hod@gmail.com"
-        assert data["role"] == "admin"
+        assert data["role"] == "faculty"
 
 @pytest.mark.asyncio
 async def test_login_invalid_password():
@@ -52,7 +54,7 @@ async def test_seed_migrates_existing_demo_passwords():
     )
     await db.users.update_one(
         {"id": "a2d35653-e0be-54d3-867d-4787e6d7cd1f"},
-        {"$set": {"password_hash": hash_password("pass-hod123")}},
+        {"$set": {"password_hash": hash_password("pass-hod123"), "role": "admin"}},
     )
     await seed_database()
 
@@ -61,12 +63,13 @@ async def test_seed_migrates_existing_demo_passwords():
             "email": "aman@gmail.com",
             "password": "aman123",
         })
-        admin = await client.post("/api/auth/login", json={
+        faculty_old = await client.post("/api/auth/login", json={
             "email": "hod@gmail.com",
-            "password": "hod123",
+            "password": "pass-hod123",
         })
         assert student.status_code == 200
-        assert admin.status_code == 200
+        assert faculty_old.status_code == 200
+        assert faculty_old.json()["role"] == "faculty"
 
 @pytest.mark.asyncio
 async def test_broken_seed_resource_links_are_retired_but_repaired_links_are_preserved():
@@ -127,7 +130,7 @@ async def test_student_forbidden_on_admin_stats():
         assert resp.status_code == 403
 
 @pytest.mark.asyncio
-async def test_admin_stats_success():
+async def test_faculty_stats_success():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # Login as admin
         await client.post("/api/auth/login", json={
@@ -141,7 +144,7 @@ async def test_admin_stats_success():
         assert "students" in data
 
 @pytest.mark.asyncio
-async def test_admin_notice_crud():
+async def test_faculty_notice_crud():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # Login as admin
         await client.post("/api/auth/login", json={
@@ -275,3 +278,49 @@ async def test_event_registration_response_and_cancellation():
         cancelled = await client.delete(f"/api/events/{event_id}/register")
         assert cancelled.status_code == 200
         assert cancelled.json()["status"] == "unregistered"
+
+@pytest.mark.asyncio
+async def test_site_admin_bootstrap_and_account_management_security():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as admin:
+        login = await admin.post("/api/auth/login", json={"email": "admin@gmail.com", "password": "test-site-admin-password"})
+        assert login.status_code == 200 and login.json()["role"] == "site_admin"
+        created = await admin.post("/api/site-admin/accounts", json={"name":"New Student", "email":"  New.Student@example.com ", "password":"long-password", "role":"student", "roll_no":"R100"})
+        assert created.status_code == 200
+        data = created.json()
+        assert data["email"] == "new.student@example.com" and "password_hash" not in data and "password" not in data
+        assert (await admin.post("/api/site-admin/accounts", json={"name":"Dup", "email":"NEW.STUDENT@example.com", "password":"long-password", "role":"student", "roll_no":"R101"})).status_code == 409
+        faculty = await admin.post("/api/site-admin/accounts", json={"name":"Faculty X", "email":"faculty.x@example.com", "password":"long-password", "role":"faculty"})
+        assert faculty.status_code == 200 and "password_hash" not in faculty.json()
+        assert (await admin.patch(f"/api/site-admin/accounts/{faculty.json()['id']}/status", json={"is_active":False})).status_code == 403
+        assert (await admin.delete(f"/api/site-admin/accounts/{faculty.json()['id']}")).status_code == 403
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as student:
+            student_login = await student.post("/api/auth/login", json={"email":"new.student@example.com", "password":"long-password"})
+            assert student_login.status_code == 200
+            token = student_login.cookies["session_token"]
+            assert (await admin.patch(f"/api/site-admin/accounts/{data['id']}/status", json={"is_active":False})).status_code == 200
+            assert (await student.get("/api/auth/me")).json()["user"] is None
+            assert (await student.post("/api/auth/login", json={"email":"new.student@example.com", "password":"long-password"})).status_code == 401
+            assert (await admin.delete(f"/api/site-admin/accounts/{data['id']}" )).status_code == 200
+
+@pytest.mark.asyncio
+async def test_site_admin_cannot_manage_content_and_faculty_can_view_drafts():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as site, AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as faculty:
+        await site.post("/api/auth/login", json={"email":"admin@gmail.com", "password":"test-site-admin-password"})
+        await faculty.post("/api/auth/login", json={"email":"hod@gmail.com", "password":"hod123"})
+        draft = await faculty.post("/api/notices", json={"title":"Private draft", "category":"Test", "body":"Draft", "published":False})
+        assert draft.status_code == 200
+        assert any(x["id"] == draft.json()["id"] for x in (await faculty.get("/api/notices?all=1")).json())
+        assert all(x["id"] != draft.json()["id"] for x in (await site.get("/api/notices?all=1")).json())
+        assert (await site.post("/api/notices", json={"title":"No", "category":"Test", "body":"No"})).status_code == 403
+        assert (await site.get("/api/admin/stats")).status_code == 403
+        assert (await site.post("/api/site-admin/accounts", json={"name":"Bad","email":"bad@example.com","password":"long-password","role":"site_admin"})).status_code == 422
+
+@pytest.mark.asyncio
+async def test_site_admin_cannot_use_student_portal_endpoints():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        login = await client.post("/api/auth/login", json={"email": "admin@gmail.com", "password": os.environ["SITE_ADMIN_BOOTSTRAP_PASSWORD"]})
+        assert login.status_code == 200
+        assert (await client.get("/api/academics/subjects")).status_code == 403
+        assert (await client.get("/api/support/mine")).status_code == 403
+        event_id = "0b4fa307-fc14-5551-8d07-d034eeb3915a"
+        assert (await client.post(f"/api/events/{event_id}/register")).status_code == 403

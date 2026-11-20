@@ -41,7 +41,7 @@ const FEATURES = [
   { icon: CalendarDays, title: "Events & Clubs", text: "Hackathons, workshops, tech talks and cultural evenings from Coding, Robotics, CSI and ISTE clubs. One-tap RSVP." },
   { icon: FolderOpen, title: "Campus Resources", text: "Syllabus copies, lab manuals, previous papers, academic calendar and official portal links in one shelf." },
   { icon: LifeBuoy, title: "Student Support", text: "Raise a campus query or complaint and track its journey from pending to resolved with a live ticket timeline." },
-  { icon: ShieldCheck, title: "Admin Console", text: "The HOD's office publishes notices, curates events and resources, and resolves student tickets from a single dashboard." },
+  { icon: ShieldCheck, title: "Faculty Dashboard", text: "Faculty publish notices, curate events and resources, and resolve student tickets from a single dashboard." },
 ];
 
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.05 } } };
@@ -80,9 +80,10 @@ export default function Home() {
             <Button variant="ghost" data-testid="header-student-login-link" render={<Link to="/login" />}>
               Student Login
             </Button>
-            <Button data-testid="header-admin-login-link" render={<Link to="/login" state={{ role: "admin" }} />}>
-              <ShieldCheck className="size-4" /> Admin
+            <Button data-testid="header-admin-login-link" render={<Link to="/login" state={{ role: "faculty" }} />}>
+              <ShieldCheck className="size-4" /> Faculty
             </Button>
+            <Button variant="outline" data-testid="header-site-admin-login-link" render={<Link to="/login" state={{ role: "site_admin" }} />}>Site Admin</Button>
           </div>
         </div>
       </header>
@@ -108,9 +109,9 @@ export default function Home() {
                 variant="outline"
                 data-testid="hero-admin-login-button"
                 className="border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white"
-                render={<Link to="/login" state={{ role: "admin" }} />}
+                render={<Link to="/login" state={{ role: "faculty" }} />}
               >
-                Administrator Login
+                Faculty Login
               </Button>
             </div>
             <dl className="mt-8 flex flex-wrap gap-8">
@@ -164,7 +165,7 @@ export default function Home() {
           <p className="font-mono text-xs font-semibold uppercase tracking-wider text-[#D97706]">What's inside</p>
           <h2 className="mt-2 font-heading text-3xl font-bold tracking-tight">Everything a student needs, in one place</h2>
           <p className="mt-2 text-muted-foreground">
-            Six connected sections replace a dozen scattered links — and an admin console keeps every piece of it current.
+            Six connected sections replace a dozen scattered links — and an Faculty Dashboard keeps every piece of it current.
           </p>
         </div>
         <motion.div
@@ -257,7 +258,7 @@ export default function Home() {
             <h2 className="mt-2 font-heading text-3xl font-bold tracking-tight">Demo accounts are ready to present</h2>
             <p className="mt-2 text-muted-foreground">
               The portal ships with realistic department data. Sign in with either role and demonstrate the full
-              flow — notices, events, resources, support tickets and the admin console.
+              flow — notices, events, resources, support tickets and the Faculty Dashboard.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -265,16 +266,17 @@ export default function Home() {
               <CardContent className="p-4">
                 <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Student</p>
                 <p className="mt-1 font-medium">aman@gmail.com</p>
-                <p className="text-xs text-muted-foreground">Use the viva credentials on the sign-in screen.</p>
+                <p className="text-xs text-muted-foreground">Use your assigned credentials on the sign-in screen.</p>
               </CardContent>
             </Card>
             <Card size="sm" className="bg-secondary/50">
               <CardContent className="p-4">
-                <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Administrator</p>
+                <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Faculty</p>
                 <p className="mt-1 font-medium">hod@gmail.com</p>
-                <p className="text-xs text-muted-foreground">Use the viva credentials on the sign-in screen.</p>
+                <p className="text-xs text-muted-foreground">Use your assigned credentials on the sign-in screen.</p>
               </CardContent>
             </Card>
+            <Card size="sm" className="bg-secondary/50"><CardContent className="p-4"><p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Site Admin</p><p className="mt-1 font-medium">Account provisioning</p><p className="text-xs text-muted-foreground">Credentials are provisioned securely by the institution.</p></CardContent></Card>
             <Link
               to="/login"
               data-testid="landing-go-to-login-button"
